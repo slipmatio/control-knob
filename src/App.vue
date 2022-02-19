@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import ControlKnob from './ControlKnob.vue'
-
-console.log('Hello knob.')
+import Designer from './Designer.vue'
 </script>
 <template>
-  <div class="p-4">
-    <h2>Hello Knob</h2>
+  <div class="p-4 bg-[#575757] text-gray-100">
+    <h2 class="mb-6 text-3xl font-semibold">Knob Designer</h2>
 
     <div>
-      <ControlKnob />
+      <Designer />
     </div>
   </div>
 </template>
