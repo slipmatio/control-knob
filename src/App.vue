@@ -4,7 +4,7 @@ import ControlKnob from './ControlKnob.vue'
 console.log('Hello knob.')
 </script>
 <template>
-  <div>
+  <div class="p-4">
     <h2>Hello Knob</h2>
 
     <div>
