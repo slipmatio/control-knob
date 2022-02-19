@@ -6,11 +6,15 @@ const ready = ref(false)
 // 2PI radians = 360 degrees
 // 1 radian = 180/PI degrees = 57.2957795 degrees
 
-const RADIUS = 40
+const RADIUS = 45
 const MID_X = 50
 const MID_Y = 50
 const rad = 180 / Math.PI
-const controlAngle = ref(0)
+const controlAngle = ref(120)
+const lineLength = ref(10)
+const lineStroke = ref(2)
+const imageSize = ref(100)
+const rimWidth = ref(2)
 // const strokeWidth = 1
 
 const origo = {
@@ -25,11 +29,6 @@ const origo = {
 
 // const secondaryColor = '#dcdfe6'
 // const stepSize = 1
-
-// const minX = computed(() => MID_X + Math.cos(MIN_RADIANS) * RADIUS)
-// const minY = computed(() => MID_Y - Math.sin(MIN_RADIANS) * RADIUS)
-// const maxX = computed(() => MID_X + Math.cos(MAX_RADIANS) * RADIUS)
-// const maxY = computed(() => MID_Y - Math.sin(MAX_RADIANS) * RADIUS)
 
 // const firstLine = `M ${origo.x},${origo.y} L ${origo.x + RADIUS},50`
 
@@ -63,6 +62,14 @@ const line2 = computed(
   () => `M ${origo.x},${origo.y} L ${50 + Math.cos(rad2) * RADIUS},${50 + Math.sin(rad2) * RADIUS}`
 )
 
+const lineStartX = computed(() => {
+  return 50 + Math.cos(degToRad(controlAngle.value)) * (RADIUS - lineLength.value)
+})
+
+const lineStartY = computed(() => {
+  return 50 + Math.sin(degToRad(controlAngle.value)) * (RADIUS - lineLength.value)
+})
+
 const lineEndX = computed(() => {
   return 50 + Math.cos(degToRad(controlAngle.value)) * RADIUS
 })
@@ -79,39 +86,42 @@ onMounted(() => {
   ready.value = true
 })
 </script>
+<style>
+.knob {
+  width: --imageSize;
+}
+</style>
 <template>
   <div>
-    <p>angle: {{ controlAngle }}</p>
-    <input type="range" min="0" max="360" v-model="controlAngle" />
+    <div>
+      <p>angle: {{ controlAngle }}</p>
+      <input type="range" min="120" max="420" v-model="controlAngle" />
+    </div>
+
+    <div>
+      <p>line length: {{ lineLength }}</p>
+      <input type="range" min="1" max="50" v-model="lineLength" />
+    </div>
+
+    <div>
+      <p>line stroke: {{ lineStroke }}</p>
+      <input type="range" min="1" max="6" v-model="lineStroke" />
+    </div>
+
+    <div>
+      <p>rim width: {{ rimWidth }}</p>
+      <input type="range" min="1" max="8" v-model="rimWidth" />
+    </div>
+
+    <div>
+      <p>image size: {{ imageSize }}</p>
+      <input type="range" min="30" max="200" v-model="imageSize" />
+    </div>
   </div>
 
   <div class="flex flex-row space-x-4">
     <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
-    </svg>
-    <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
-      <path
-        :d="cosLine"
-        :stroke-width="3"
-        stroke="currentColor"
-        class="text-blue-600"
-        fill="transparent"
-      ></path>
-    </svg>
-    <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
-      <path
-        :d="sinLine"
-        :stroke-width="3"
-        stroke="currentColor"
-        class="text-blue-600"
-        fill="transparent"
-      ></path>
-    </svg>
-    <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
+      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" :stroke-width="rimWidth" />
       <path
         :d="thirdLine"
         :stroke-width="3"
@@ -121,11 +131,25 @@ onMounted(() => {
       ></path>
     </svg>
     <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
+      <circle
+        cx="50"
+        cy="50"
+        :r="RADIUS"
+        stroke="red"
+        fill="transparent"
+        :stroke-width="rimWidth"
+      />
       <line x1="50" y1="50" :x2="lineEndX" :y2="lineEndY" stroke="black" stroke-width="2" />
     </svg>
     <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
+      <circle
+        cx="50"
+        cy="50"
+        :r="RADIUS"
+        stroke="red"
+        fill="transparent"
+        :stroke-width="rimWidth"
+      />
       <path
         :d="line1"
         :stroke-width="3"
@@ -140,10 +164,36 @@ onMounted(() => {
         class="text-blue-600"
         fill="transparent"
       ></path>
+      <path
+        :d="thirdLine"
+        :stroke-width="1"
+        stroke="currentColor"
+        class="text-red-600"
+        fill="transparent"
+      ></path>
     </svg>
-    <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle cx="50" cy="50" r="40" stroke="red" fill="transparent" stroke-width="1" />
-      <line x1="50" y1="50" :x2="lineEndX" :y2="lineEndY" stroke="black" stroke-width="2" />
+    <svg
+      :width="imageSize"
+      :height="imageSize"
+      viewBox="0 0 100 100"
+      class="text-red-500 bg-slate-200"
+    >
+      <circle
+        cx="50"
+        cy="50"
+        :r="RADIUS"
+        stroke="red"
+        fill="transparent"
+        :stroke-width="rimWidth"
+      />
+      <line
+        :x1="lineStartX"
+        :y1="lineStartY"
+        :x2="lineEndX"
+        :y2="lineEndY"
+        stroke="black"
+        :stroke-width="lineStroke"
+      />
     </svg>
   </div>
 
