@@ -1,3 +1,8 @@
+<script setup lang="ts">
+console.log('Hello knob.')
+</script>
 <template>
-  <router-view></router-view>
+  <div>
+    <h2>Hello Knob</h2>
+  </div>
 </template>

@@ -355,11 +355,6 @@
     "@vue/compiler-dom" "3.2.30"
     "@vue/shared" "3.2.30"
 
-"@vue/devtools-api@^6.0.0-beta.11", "@vue/devtools-api@^6.0.0-beta.18":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@vue/devtools-api/-/devtools-api-6.0.0.tgz#f690a9776ab3c19f5605f4b10daf31a10221a405"
-  integrity sha512-v6i9kWtUZ3iiOGOj43tkisp0o5RJ9jOG3/tDA48J51TZt31DG4sr49mjaZOG8CkWFVE52bkzyozZmwcNrGNviQ==
-
 "@vue/eslint-config-standard@~6.1":
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/@vue/eslint-config-standard/-/eslint-config-standard-6.1.0.tgz#b362ba67c86caa4e7b44481c2303c9dccc2dc037"
@@ -430,11 +425,6 @@
   version "2.0.0-rc.17"
   resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-2.0.0-rc.17.tgz#e6dcf5b5bd3ae23595bdb154b9b578ebcdffd698"
   integrity sha512-7LHZKsFRV/HqDoMVY+cJamFzgHgsrmQFalROHC5FMWrzPzd+utG5e11krj1tVsnxYufGA2ABShX4nlcHXED+zQ==
-
-"@vueuse/head@~0.7":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@vueuse/head/-/head-0.7.5.tgz#0284e3dc53ea6709196956bf25115eea863a847a"
-  integrity sha512-L+XQ5Act0nT/ZyO8Qo10J4FyM1qPOyQb6MT4MMn6+AITzrStpmKs/nUDDLJKD/rCcNWl/65XbdQm4T2vKp3VOQ==
 
 acorn-jsx@^5.3.1:
   version "5.3.2"
@@ -3055,13 +3045,6 @@ vue-eslint-parser@^8.0.0, vue-eslint-parser@^8.0.1:
     lodash "^4.17.21"
     semver "^7.3.5"
 
-vue-router@~4.0:
-  version "4.0.12"
-  resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.0.12.tgz#8dc792cddf5bb1abcc3908f9064136de7e13c460"
-  integrity sha512-CPXvfqe+mZLB1kBWssssTiWg4EQERyqJZes7USiqfW9B5N2x+nHlnsM1D3b5CaJ6qgCvMmYJnz+G0iWjNCvXrg==
-  dependencies:
-    "@vue/devtools-api" "^6.0.0-beta.18"
-
 vue@~3.2:
   version "3.2.30"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.2.30.tgz#47de3039631ac22cab2fd26b427575260199b8bb"
@@ -3072,13 +3055,6 @@ vue@~3.2:
     "@vue/runtime-dom" "3.2.30"
     "@vue/server-renderer" "3.2.30"
     "@vue/shared" "3.2.30"
-
-vuex@~4.0:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/vuex/-/vuex-4.0.2.tgz#f896dbd5bf2a0e963f00c67e9b610de749ccacc9"
-  integrity sha512-M6r8uxELjZIK8kTKDGgZTYX/ahzblnzC4isU1tpmEuOIIKmV+TRdc+H4s8ds2NuZ7wpUTdGRzJRtoj+lI+pc0Q==
-  dependencies:
-    "@vue/devtools-api" "^6.0.0-beta.11"
 
 wait-on@~6.0:
   version "6.0.0"
