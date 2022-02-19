@@ -272,6 +272,17 @@ onMounted(() => {
         stroke="black"
         :stroke-width="lineStroke"
       />
+
+      <text
+        v-if="controlAngle > 120"
+        :x="50"
+        :y="62"
+        text-anchor="middle"
+        fill="currentColor"
+        class="text-gray-50 text-[30px] font-normal"
+      >
+        {{ parseInt(controlAngle / 10) }}
+      </text>
     </svg>
   </div>
 
