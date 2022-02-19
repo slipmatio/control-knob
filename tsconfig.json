@@ -9,6 +9,7 @@
     "lib": ["esnext", "dom"],
     "types": ["vite/client", "cypress"],
     "resolveJsonModule": true,
+    "allowJs": true,
     "plugins": [{ "name": "@vuedx/typescript-plugin-vue" }],
     "paths": {
       "@/*": ["./src/*"]
