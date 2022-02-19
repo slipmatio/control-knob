@@ -279,7 +279,7 @@ onMounted(() => {
         :y="62"
         text-anchor="middle"
         fill="currentColor"
-        class="text-gray-50 text-[30px] font-normal"
+        class="text-gray-50 text-[30px] font-normal font-mono"
       >
         {{ parseInt(controlAngle / 10) }}
       </text>
