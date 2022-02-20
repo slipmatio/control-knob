@@ -12,6 +12,7 @@ const imageSize = ref(40)
 const rimStroke = ref(11)
 const valueArchStroke = ref(11)
 const bgRadius = ref(34)
+const shiftModifier = ref(false)
 // const stepSize = 1
 
 const tickStartX = computed(() => {
@@ -72,7 +73,7 @@ const moveListener = leadingDebounce((event: MouseEvent) => {
     currentY = event.clientY
     let direction: 'up' | 'down'
     const curYchange = prevY - currentY
-    const curAbsolutechange = startY - currentY
+    // const curAbsolutechange = startY - currentY
 
     if (curYchange < 0) {
       direction = 'down'
@@ -80,12 +81,25 @@ const moveListener = leadingDebounce((event: MouseEvent) => {
       direction = 'up'
     }
 
+    // console.log(
+    //   `move. direction: ${direction}, curYchange: ${curYchange}, yChange: ${yChange}, prevY: ${prevY}, currentY: ${currentY}`
+    // )
+
     if (
-      curYchange !== yChange &&
+      prevY !== currentY &&
       ((direction === 'up' && controlAngle.value < MAX_ANGLE) ||
         (direction === 'down' && controlAngle.value > MIN_ANGLE))
     ) {
-      controlAngle.value = changeToControlAngle(startValue, curAbsolutechange)
+      const change = changeToControlAngle(prevY, curYchange, shiftModifier.value)
+
+      if (controlAngle.value + change < MIN_ANGLE) {
+        controlAngle.value = MIN_ANGLE
+      } else if (controlAngle.value + change > MAX_ANGLE) {
+        controlAngle.value = MAX_ANGLE
+      } else {
+        controlAngle.value += change
+      }
+
       yChange = curYchange
     }
     prevY = currentY
@@ -100,6 +114,18 @@ function resetValue() {
   controlAngle.value = MIN_ANGLE
 }
 
+function setShiftModifier(event: KeyboardEvent) {
+  if (event.key === 'Shift') {
+    shiftModifier.value = true
+  }
+}
+
+function unsetShiftModifier(event: KeyboardEvent) {
+  if (event.key === 'Shift') {
+    shiftModifier.value = false
+  }
+}
+
 watch(
   () => knob.value,
   (element) => {
@@ -107,6 +133,8 @@ watch(
       element.addEventListener('mousedown', downListener)
       document.addEventListener('mouseup', upListener)
       document.addEventListener('mousemove', moveListener)
+      document.addEventListener('keydown', setShiftModifier)
+      document.addEventListener('keyup', unsetShiftModifier)
     }
   }
 )
@@ -116,6 +144,8 @@ onBeforeUnmount(() => {
   knob.value.removeEventListener('mousedown', downListener)
   document.removeEventListener('mouseup', upListener)
   document.removeEventListener('mousemove', moveListener)
+  document.removeEventListener('keydown', setShiftModifier)
+  document.removeEventListener('keyup', unsetShiftModifier)
 })
 </script>
 <template>

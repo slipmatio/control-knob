@@ -19,20 +19,14 @@ export function leadingDebounce<A = unknown, R = void>(func: (args: A) => R, tim
   }
 }
 
-export function changeToControlAngle(startValue: number, change: number) {
+export function changeToControlAngle(startValue: number, change: number, shiftModifier = false) {
+  let controlYrange = 150
+  if (shiftModifier) {
+    controlYrange = controlYrange * 10
+  }
   const controlRange = MAX_ANGLE - MIN_ANGLE
-  const controlYrange = 150
   const pixelChange = controlRange / controlYrange
   const controlAngleChange = change * pixelChange
 
-  let absoluteValue = startValue + controlAngleChange
-  if (absoluteValue < 120) {
-    absoluteValue = 120
-  }
-
-  if (absoluteValue > 420) {
-    absoluteValue = 420
-  }
-
-  return absoluteValue
+  return controlAngleChange
 }

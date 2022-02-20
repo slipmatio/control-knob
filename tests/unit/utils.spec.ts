@@ -46,19 +46,30 @@ describe('leadingDebounce', () => {
 
 test('changeToControlAngle', () => {
   // up from minimum
-  expect(changeToControlAngle(MIN_ANGLE, 0)).toEqual(MIN_ANGLE)
-  expect(changeToControlAngle(MIN_ANGLE, -10)).toEqual(MIN_ANGLE)
-  expect(changeToControlAngle(MIN_ANGLE, 10)).toEqual(MIN_ANGLE + 20)
-  expect(changeToControlAngle(MIN_ANGLE, 200)).toEqual(420)
+  expect(changeToControlAngle(MIN_ANGLE, 0, false)).toEqual(0)
+  expect(changeToControlAngle(MIN_ANGLE, 0, true)).toEqual(0)
+  expect(changeToControlAngle(MIN_ANGLE, -10, false)).toEqual(-20)
+  expect(changeToControlAngle(MIN_ANGLE, -10, true)).toEqual(-2)
+  expect(changeToControlAngle(MIN_ANGLE, 10, false)).toEqual(20)
+  expect(changeToControlAngle(MIN_ANGLE, 10, true)).toEqual(2)
+  expect(changeToControlAngle(MIN_ANGLE, 200, false)).toEqual(400)
+  expect(changeToControlAngle(MIN_ANGLE, 200, true)).toEqual(40)
 
   // dowm from maximum
-  expect(changeToControlAngle(MAX_ANGLE, 0)).toEqual(MAX_ANGLE)
-  expect(changeToControlAngle(MAX_ANGLE, 10)).toEqual(MAX_ANGLE)
-  expect(changeToControlAngle(MAX_ANGLE, -10)).toEqual(MAX_ANGLE - 20)
-  expect(changeToControlAngle(MAX_ANGLE, -200)).toEqual(MIN_ANGLE)
+  expect(changeToControlAngle(MAX_ANGLE, 0, false)).toEqual(0)
+  expect(changeToControlAngle(MAX_ANGLE, 0, true)).toEqual(0)
+  expect(changeToControlAngle(MAX_ANGLE, 10, false)).toEqual(20)
+  expect(changeToControlAngle(MAX_ANGLE, 10, true)).toEqual(2)
+  expect(changeToControlAngle(MAX_ANGLE, -10, false)).toEqual(-20)
+  expect(changeToControlAngle(MAX_ANGLE, -10, true)).toEqual(-2)
+  expect(changeToControlAngle(MAX_ANGLE, -200, false)).toEqual(-400)
+  expect(changeToControlAngle(MAX_ANGLE, -200, true)).toEqual(-40)
 
   // misc changes
-  expect(changeToControlAngle(200, 0)).toEqual(200)
-  expect(changeToControlAngle(200, 10)).toEqual(220)
-  expect(changeToControlAngle(200, -10)).toEqual(180)
+  expect(changeToControlAngle(200, 0, false)).toEqual(0)
+  expect(changeToControlAngle(200, 0, true)).toEqual(0)
+  expect(changeToControlAngle(200, 30, false)).toEqual(60)
+  expect(changeToControlAngle(200, 30, true)).toEqual(6)
+  expect(changeToControlAngle(200, -30, false)).toEqual(-60)
+  expect(changeToControlAngle(200, -30, true)).toEqual(-6)
 })
