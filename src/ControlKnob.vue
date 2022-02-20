@@ -51,21 +51,15 @@ const valueArch = computed(
     `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`
 )
 
-let startY = 0
 let prevY = 0
 let currentY = 0
-let yChange = 0
-let startValue = 0
 const mouseIsDown = ref(false)
 const mouseMoved = ref(false)
 
 const downListener = (event: MouseEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
-  startY = event.clientY
   prevY = event.clientY
-  startValue = controlAngle.value
-  // console.log('event: ', event)
 }
 const moveListener = leadingDebounce((event: MouseEvent) => {
   mouseMoved.value = true
@@ -99,8 +93,6 @@ const moveListener = leadingDebounce((event: MouseEvent) => {
       } else {
         controlAngle.value += change
       }
-
-      yChange = curYchange
     }
     prevY = currentY
   }
