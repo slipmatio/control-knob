@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { degToRad, leadingDebounce, changeToControlAngle } from '@/utils'
+import { RADIUS, HALF_VIEWBOX, MIN_ANGLE, MAX_ANGLE } from '@/constants'
 
 const knob = ref<HTMLElement>(0 as unknown as HTMLElement)
-const RADIUS = 40
-const IMAGE_VIEWBOX = 100
-const HALF_VIEWBOX = IMAGE_VIEWBOX / 2
-const minControlAngle = 120
-const maxControlAngle = 420
-const controlAngle = ref(minControlAngle)
+const controlAngle = ref(MIN_ANGLE)
 const tickLength = ref(18)
 const tickOffset = ref(10)
 const lineStroke = ref(3)
@@ -16,10 +13,6 @@ const rimStroke = ref(11)
 const valueArchStroke = ref(11)
 const bgRadius = ref(34)
 // const stepSize = 1
-
-function degToRad(degrees: number) {
-  return (degrees * Math.PI) / 180
-}
 
 const tickStartX = computed(() => {
   return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
@@ -61,96 +54,55 @@ let startY = 0
 let currentY = 0
 let yChange = 0
 let startValue = 0
-let absoluteValue = 120
 const mouseIsDown = ref(false)
 const mouseMoved = ref(false)
-
-function debounceLeading(func: any, timeout = 10) {
-  let timer: any
-  return (...args: any) => {
-    if (!timer) {
-      func.apply(this, args)
-    }
-    clearTimeout(timer)
-    timer = setTimeout(() => {
-      timer = undefined
-    }, timeout)
-  }
-}
-
-function changeToControlAngle(change: number) {
-  const controlRange = maxControlAngle - minControlAngle
-  const controlYrange = 180
-
-  const pixelChange = controlRange / controlYrange
-
-  // 200px => 400
-  // 1px = 300 / 400
-
-  const controlAngleChange = change * pixelChange
-  console.log('controlAngleChange absolute value: ', controlAngleChange)
-
-  absoluteValue = startValue + controlAngleChange
-  if (absoluteValue < 120) {
-    absoluteValue = 120
-  }
-
-  if (absoluteValue > 420) {
-    absoluteValue = 420
-  }
-
-  console.log('controlAngle absolute value: ', absoluteValue)
-  controlAngle.value = absoluteValue
-}
 
 const downListener = (event: MouseEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
   startY = event.clientY
   startValue = controlAngle.value
-  console.log('event: ', event)
+  // console.log('event: ', event)
 }
-const moveListener = debounceLeading((event: MouseEvent) => {
+const moveListener = leadingDebounce((event: MouseEvent) => {
   mouseMoved.value = true
 
   if (mouseIsDown.value) {
     currentY = event.clientY
     const curYchange = startY - currentY
-    if (curYchange !== yChange) {
+    let direction = 'up'
+    if (curYchange < 0) {
+      direction = 'down'
+    }
+
+    if (
+      curYchange !== yChange &&
+      ((direction === 'up' && controlAngle.value < MAX_ANGLE) ||
+        (direction === 'down' && controlAngle.value > MIN_ANGLE))
+    ) {
       yChange = curYchange
-      changeToControlAngle(yChange)
-      console.log('movinn. y change: ', curYchange, yChange)
+      controlAngle.value = changeToControlAngle(startValue, yChange)
     }
   }
 })
 
 const upListener = () => {
   mouseIsDown.value = false
-
-  if (mouseMoved.value) {
-    console.log('moved')
-  } else {
-    console.log('not moved')
-  }
 }
 
 watch(
   () => knob.value,
   (element) => {
     if (element) {
-      console.log('knob is mounted', element)
       element.addEventListener('mousedown', downListener)
       document.addEventListener('mouseup', upListener)
       document.addEventListener('mousemove', moveListener)
-    } else {
-      console.log('knob element', element)
     }
   }
 )
 
 onBeforeUnmount(() => {
   console.log('before unmount')
-
   knob.value.removeEventListener('mousedown', downListener)
   document.removeEventListener('mouseup', upListener)
   document.removeEventListener('mousemove', moveListener)
