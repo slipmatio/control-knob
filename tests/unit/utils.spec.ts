@@ -17,7 +17,6 @@ describe('leadingDebounce', () => {
 
   beforeEach(() => {
     func = vi.fn()
-    vi.useFakeTimers()
   })
   afterEach(() => {
     vi.restoreAllMocks()
@@ -33,15 +32,15 @@ describe('leadingDebounce', () => {
     expect(mock).toHaveBeenCalledTimes(1)
     expect(func).toHaveBeenCalledTimes(1)
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       mock(1)
       debouncedMock()
     }
 
     // @ts-expect-error missing typings
-    expect(mock.calls.length).toBe(11)
+    expect(mock.calls.length).toBe(6)
     // @ts-expect-error missing typings
-    expect(func.calls.length).toBeLessThan(11)
+    expect(func.calls.length).toBeLessThan(6)
   })
 })
 

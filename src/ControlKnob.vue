@@ -51,6 +51,7 @@ const valueArch = computed(
 )
 
 let startY = 0
+let prevY = 0
 let currentY = 0
 let yChange = 0
 let startValue = 0
@@ -61,18 +62,22 @@ const downListener = (event: MouseEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
   startY = event.clientY
+  prevY = event.clientY
   startValue = controlAngle.value
   // console.log('event: ', event)
 }
 const moveListener = leadingDebounce((event: MouseEvent) => {
   mouseMoved.value = true
-
   if (mouseIsDown.value) {
     currentY = event.clientY
-    const curYchange = startY - currentY
-    let direction = 'up'
+    let direction: 'up' | 'down'
+    const curYchange = prevY - currentY
+    const curAbsolutechange = startY - currentY
+
     if (curYchange < 0) {
       direction = 'down'
+    } else {
+      direction = 'up'
     }
 
     if (
@@ -80,14 +85,19 @@ const moveListener = leadingDebounce((event: MouseEvent) => {
       ((direction === 'up' && controlAngle.value < MAX_ANGLE) ||
         (direction === 'down' && controlAngle.value > MIN_ANGLE))
     ) {
+      controlAngle.value = changeToControlAngle(startValue, curAbsolutechange)
       yChange = curYchange
-      controlAngle.value = changeToControlAngle(startValue, yChange)
     }
+    prevY = currentY
   }
 })
 
 const upListener = () => {
   mouseIsDown.value = false
+}
+
+function resetValue() {
+  controlAngle.value = MIN_ANGLE
 }
 
 watch(
@@ -109,7 +119,14 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-  <svg :width="imageSize" :height="imageSize" viewBox="0 0 100 100" ref="knob" class="select-none">
+  <svg
+    :width="imageSize"
+    :height="imageSize"
+    viewBox="0 0 100 100"
+    ref="knob"
+    class="select-none"
+    @click.alt="resetValue"
+  >
     <circle
       :cx="HALF_VIEWBOX"
       :cy="HALF_VIEWBOX"
