@@ -6,7 +6,8 @@ Features:
 - Moves only with vertical mouse movement
 - Option-click (alt-click) resets the value to default
 - Precice mode w/ shift + movement
-- Double-clicking allows manual input
+- Supports mouse & wheel
+- Planned: Double-clicking allows manual input
 ## Development
 
 ### Install dependencies
