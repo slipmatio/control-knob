@@ -1,5 +1,10 @@
 import { describe, it, beforeEach, afterEach, expect, test, vi } from 'vitest'
-import { degToRad, leadingDebounce, changeToControlAngle } from '../../src/utils'
+import {
+  degToRad,
+  leadingDebounce,
+  changeToControlAngle,
+  controlAngleToValue,
+} from '../../src/utils'
 import { MIN_ANGLE, MAX_ANGLE } from '../../src/constants'
 
 const testfn = (a: number) => a + 1
@@ -72,4 +77,15 @@ test('changeToControlAngle', () => {
   expect(changeToControlAngle(200, 30, true)).toEqual(6)
   expect(changeToControlAngle(200, -30, false)).toEqual(-60)
   expect(changeToControlAngle(200, -30, true)).toEqual(-6)
+})
+
+test('controlAngleToValue', () => {
+  // 0-100
+  expect(controlAngleToValue(0, 100, 120)).toEqual(0)
+  expect(controlAngleToValue(0, 100, 270)).toEqual(50)
+  expect(controlAngleToValue(0, 100, 420)).toEqual(100)
+  // -64-64
+  expect(controlAngleToValue(-64, 64, 120)).toEqual(-64)
+  expect(controlAngleToValue(-64, 64, 270)).toEqual(0)
+  expect(controlAngleToValue(-64, 64, 420)).toEqual(64)
 })

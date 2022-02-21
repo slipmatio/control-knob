@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
-import { degToRad, leadingDebounce, changeToControlAngle } from '@/utils'
+import { degToRad, leadingDebounce, changeToControlAngle, controlAngleToValue } from '@/utils'
 import { RADIUS, HALF_VIEWBOX, MIN_ANGLE, MAX_ANGLE } from '@/constants'
 
 const knob = ref<HTMLElement>(0 as unknown as HTMLElement)
@@ -13,7 +13,9 @@ const rimStroke = ref(11)
 const valueArchStroke = ref(11)
 const bgRadius = ref(34)
 const shiftModifier = ref(false)
-// const stepSize = 1
+const knobValue = ref(0)
+const knobMinValue = -64
+const knobMaxValue = 64
 
 const tickStartX = computed(() => {
   return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
@@ -93,6 +95,8 @@ const moveListener = leadingDebounce((event: MouseEvent) => {
       } else {
         controlAngle.value += change
       }
+
+      knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
     }
     prevY = currentY
   }
@@ -127,6 +131,7 @@ watch(
       document.addEventListener('mousemove', moveListener)
       document.addEventListener('keydown', setShiftModifier)
       document.addEventListener('keyup', unsetShiftModifier)
+      knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
     }
   }
 )
@@ -194,7 +199,7 @@ onBeforeUnmount(() => {
       fill="currentColor"
       class="text-gray-50 text-[30px] font-normal font-mono"
     >
-      {{ Math.ceil(controlAngle / 10) }}
+      {{ Math.ceil(knobValue) }}
     </text>
   </svg>
 </template>

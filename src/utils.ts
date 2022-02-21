@@ -30,3 +30,17 @@ export function changeToControlAngle(startValue: number, change: number, shiftMo
 
   return controlAngleChange
 }
+
+export function controlAngleToValue(minValue: number, maxValue: number, controlAngle: number) {
+  let controlPercentage: number
+  const controlRange = MAX_ANGLE - MIN_ANGLE
+  const valueRange = maxValue - minValue
+  if (controlAngle === MIN_ANGLE) {
+    controlPercentage = 0
+  } else if (controlAngle === MAX_ANGLE) {
+    controlPercentage = 1
+  } else {
+    controlPercentage = (controlAngle - MIN_ANGLE) / controlRange
+  }
+  return minValue + valueRange * controlPercentage
+}

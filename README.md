@@ -1,12 +1,12 @@
 # Control Knob
 
-Design goals:
+Features:
 
 - Works as close as possible to native controls like on Ableton Live or Logic Pro
 - Moves only with vertical mouse movement
-- Option-Click resets the value to default
-- Double-clicking allows manual input
+- Option-click (alt-click) resets the value to default
 - Precice mode w/ shift + movement
+- Double-clicking allows manual input
 ## Development
 
 ### Install dependencies
