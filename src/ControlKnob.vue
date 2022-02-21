@@ -128,15 +128,20 @@ function resetValue() {
 }
 
 function changeValue(change: number) {
-  if (change < MAX_ANGLE) {
-    controlAngle.value = change
-  } else {
-    controlAngle.value = MAX_ANGLE
+  if (change > controlAngle.value) {
+    if (change < MAX_ANGLE) {
+      controlAngle.value = change
+    } else {
+      controlAngle.value = MAX_ANGLE
+    }
   }
-  if (change > MIN_ANGLE) {
-    controlAngle.value = change
-  } else {
-    controlAngle.value = MIN_ANGLE
+
+  if (change < controlAngle.value) {
+    if (change < controlAngle.value && change > MIN_ANGLE) {
+      controlAngle.value = change
+    } else {
+      controlAngle.value = MIN_ANGLE
+    }
   }
   knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
 }
