@@ -14,8 +14,11 @@ const valueArchStroke = ref(11)
 const bgRadius = ref(34)
 const shiftModifier = ref(false)
 const knobValue = ref(0)
-const knobMinValue = -64
-const knobMaxValue = 64
+const knobMinValue = 0
+const knobMaxValue = 100
+const wheelModifierFactor = 10
+const keyModifierFactor = 10
+const focused = ref(false)
 
 const tickStartX = computed(() => {
   return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
@@ -42,7 +45,6 @@ const startRad = degToRad(120)
 const currentValueRad = computed(() => degToRad(controlAngle.value))
 const largeArch = computed(() => (Math.abs(startRad - currentValueRad.value) < Math.PI ? 0 : 1))
 const sweep = ref(1)
-// const sweep = computed(() => (currentValueRad.value < startRad ? 0 : 1))
 
 const valueEndX = computed(() => 50 + Math.cos(degToRad(controlAngle.value)) * RADIUS)
 const valueEndY = computed(() => 50 + Math.sin(degToRad(controlAngle.value)) * RADIUS)
@@ -69,17 +71,12 @@ const moveListener = leadingDebounce((event: MouseEvent) => {
     currentY = event.clientY
     let direction: 'up' | 'down'
     const curYchange = prevY - currentY
-    // const curAbsolutechange = startY - currentY
 
     if (curYchange < 0) {
       direction = 'down'
     } else {
       direction = 'up'
     }
-
-    // console.log(
-    //   `move. direction: ${direction}, curYchange: ${curYchange}, yChange: ${yChange}, prevY: ${prevY}, currentY: ${currentY}`
-    // )
 
     if (
       prevY !== currentY &&
@@ -110,16 +107,64 @@ function resetValue() {
   controlAngle.value = MIN_ANGLE
 }
 
-function setShiftModifier(event: KeyboardEvent) {
+function changeValue(change: number) {
+  if (change < MAX_ANGLE) {
+    controlAngle.value = change
+  } else {
+    controlAngle.value = MAX_ANGLE
+  }
+  if (change > MIN_ANGLE) {
+    controlAngle.value = change
+  } else {
+    controlAngle.value = MIN_ANGLE
+  }
+  knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
+}
+
+function keyDownListener(event: KeyboardEvent) {
   if (event.key === 'Shift') {
     shiftModifier.value = true
   }
+
+  if (
+    focused.value &&
+    shiftModifier.value &&
+    (event.key === 'ArrowUp' || event.key === 'ArrowDown')
+  ) {
+    event.preventDefault()
+  }
 }
 
-function unsetShiftModifier(event: KeyboardEvent) {
+function keyUpListener(event: KeyboardEvent) {
   if (event.key === 'Shift') {
     shiftModifier.value = false
   }
+
+  let newValue: number
+  const keyModifier = shiftModifier.value ? 1 : keyModifierFactor
+  if (focused.value && event.key === 'ArrowUp') {
+    newValue = controlAngle.value + 1 * keyModifier
+    changeValue(newValue)
+    if (shiftModifier.value) {
+      event.stopPropagation()
+    }
+  }
+
+  if (focused.value && event.key === 'ArrowDown') {
+    newValue = controlAngle.value - 1 * keyModifier
+    changeValue(newValue)
+  }
+}
+
+function wheelListener(event: WheelEvent) {
+  let newValue: number
+  const wheelModifier = event.shiftKey ? 1 : wheelModifierFactor
+  if ((!event.shiftKey && event.deltaY < 0) || (event.shiftKey && event.deltaX < 0)) {
+    newValue = controlAngle.value + 1 * wheelModifier
+  } else {
+    newValue = controlAngle.value - 1 * wheelModifier
+  }
+  changeValue(newValue)
 }
 
 watch(
@@ -127,10 +172,11 @@ watch(
   (element) => {
     if (element) {
       element.addEventListener('mousedown', downListener)
+      element.addEventListener('wheel', wheelListener)
       document.addEventListener('mouseup', upListener)
       document.addEventListener('mousemove', moveListener)
-      document.addEventListener('keydown', setShiftModifier)
-      document.addEventListener('keyup', unsetShiftModifier)
+      document.addEventListener('keydown', keyDownListener)
+      document.addEventListener('keyup', keyUpListener)
       knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
     }
   }
@@ -139,10 +185,11 @@ watch(
 onBeforeUnmount(() => {
   console.log('before unmount')
   knob.value.removeEventListener('mousedown', downListener)
+  knob.value.removeEventListener('wheel', wheelListener)
   document.removeEventListener('mouseup', upListener)
   document.removeEventListener('mousemove', moveListener)
-  document.removeEventListener('keydown', setShiftModifier)
-  document.removeEventListener('keyup', unsetShiftModifier)
+  document.removeEventListener('keydown', keyDownListener)
+  document.removeEventListener('keyup', keyUpListener)
 })
 </script>
 <template>
@@ -151,8 +198,16 @@ onBeforeUnmount(() => {
     :height="imageSize"
     viewBox="0 0 100 100"
     ref="knob"
-    class="select-none"
     @click.alt="resetValue"
+    role="slider"
+    aria-label="Knob"
+    :aria-valuemin="knobMinValue"
+    :aria-valuemax="knobMaxValue"
+    :aria-valuenow="knobValue"
+    class="select-none focus:outline-none focus:ring-2 focus:ring-green-500"
+    tabindex="0"
+    @focus="focused = true"
+    @blur="focused = false"
   >
     <circle
       :cx="HALF_VIEWBOX"
