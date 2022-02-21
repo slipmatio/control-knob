@@ -1,331 +1,205 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-const ready = ref(false)
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { degToRad, leadingDebounce, changeToControlAngle, controlAngleToValue } from '@/utils'
+import { RADIUS, HALF_VIEWBOX, MIN_ANGLE, MAX_ANGLE } from '@/constants'
 
-// PI radians = 180 degrees
-// 2PI radians = 360 degrees
-// 1 radian = 180/PI degrees = 57.2957795 degrees
-
-const RADIUS = 40
-const MID_X = 50
-const MID_Y = 50
-const rad = 180 / Math.PI
-const controlAngle = ref(120)
-const lineLength = ref(18)
-const lineOffset = ref(10)
+const knob = ref<HTMLElement>(0 as unknown as HTMLElement)
+const controlAngle = ref(MIN_ANGLE)
+const tickLength = ref(18)
+const tickOffset = ref(10)
 const lineStroke = ref(3)
-const imageSize = ref(100)
-const circleWidth = ref(2)
-const rimWidth = ref(11)
-const valueArchWidth = ref(11)
-// const strokeWidth = 1
+const imageSize = ref(40)
+const rimStroke = ref(11)
+const valueArchStroke = ref(11)
+const bgRadius = ref(34)
+const shiftModifier = ref(false)
+const knobValue = ref(0)
+const knobMinValue = -64
+const knobMaxValue = 64
 
-const origo = {
-  x: MID_X,
-  y: MID_Y,
-}
-
-// const stepSize = 1
-// const firstLine = `M ${origo.x},${origo.y} L ${origo.x + RADIUS},50`
-
-function degToRad(degrees: number) {
-  return (degrees * Math.PI) / 180
-}
-
-const cosLine = `M ${origo.x},${origo.y} L ${50 + Math.cos(-Math.PI) * -RADIUS * 2 + 10},50`
-const sinLine = `M ${origo.x},${origo.y} L ${50 + Math.sin(Math.PI / 2) * RADIUS * 2 + 10},50`
-
-// const angle = ((1 * Math.PI) / 4) * rad
-// const angle1 = 60
-// const angle2 = 120
-
-const rad1 = Math.PI / 3
-const rad2 = (2 * Math.PI) / 3
-
-// const thirdLine = `M ${origo.x},${origo.y} L ${RADIUS * Math.cos(angle)},${
-//   RADIUS * Math.sin(angle)
-// }`
-const thirdLine = computed(
-  () =>
-    `M ${origo.x},${origo.y} L ${50 + Math.cos(degToRad(controlAngle.value)) * RADIUS},${
-      50 + Math.sin(degToRad(controlAngle.value)) * RADIUS
-    }`
-)
-const line1 = computed(
-  () => `M ${origo.x},${origo.y} L ${50 + Math.cos(rad1) * RADIUS},${50 + Math.sin(rad1) * RADIUS}`
-)
-const line2 = computed(
-  () => `M ${origo.x},${origo.y} L ${50 + Math.cos(rad2) * RADIUS},${50 + Math.sin(rad2) * RADIUS}`
-)
-
-const lineStartX = computed(() => {
-  return 50 + Math.cos(degToRad(controlAngle.value)) * (RADIUS - lineLength.value)
+const tickStartX = computed(() => {
+  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
 })
 
-const lineStartY = computed(() => {
-  return 50 + Math.sin(degToRad(controlAngle.value)) * (RADIUS - lineLength.value)
+const tickStartY = computed(() => {
+  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
 })
 
-const lineEndX = computed(() => {
-  return 50 + Math.cos(degToRad(controlAngle.value)) * (RADIUS - lineOffset.value)
+const tickEndX = computed(() => {
+  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickOffset.value)
 })
 
-const lineEndY = computed(() => {
-  return 50 + Math.sin(degToRad(controlAngle.value)) * (RADIUS - lineOffset.value)
+const tickEndY = computed(() => {
+  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickOffset.value)
 })
 
-const rimStartX = 50 + Math.cos(degToRad(120)) * RADIUS
-const rimStartY = 50 + Math.sin(degToRad(120)) * RADIUS
-const rimEndX = 50 + Math.cos(degToRad(420)) * RADIUS
-const rimEndY = 65 + Math.cos(degToRad(420)) * RADIUS
-const rim = `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 60 1 1 ${rimEndX} ${rimEndY}`
+const rimStartX = HALF_VIEWBOX + -0.5 * RADIUS
+const rimStartY = HALF_VIEWBOX + Math.sin(degToRad(120)) * RADIUS
+const rimEndX = HALF_VIEWBOX + 0.5 * RADIUS
+const rimEndY = HALF_VIEWBOX + Math.sin(degToRad(420)) * RADIUS
 
 const startRad = degToRad(120)
 const currentValueRad = computed(() => degToRad(controlAngle.value))
 const largeArch = computed(() => (Math.abs(startRad - currentValueRad.value) < Math.PI ? 0 : 1))
 const sweep = ref(1)
-// const sweep = computed(() => (currentValueRad.value > startRad ? 0 : 1))
+// const sweep = computed(() => (currentValueRad.value < startRad ? 0 : 1))
 
 const valueEndX = computed(() => 50 + Math.cos(degToRad(controlAngle.value)) * RADIUS)
 const valueEndY = computed(() => 50 + Math.sin(degToRad(controlAngle.value)) * RADIUS)
 
+const rim = `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 1 1 ${rimEndX} ${rimEndY}`
 const valueArch = computed(
   () =>
-    `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 60 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`
+    `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`
 )
 
-// const rangePath = computed(
-//   () => `M ${minX.value} ${minY.value} A ${RADIUS} ${RADIUS} 0 1 1 ${maxX.value} ${maxY.value}`
-// )
+let prevY = 0
+let currentY = 0
+const mouseIsDown = ref(false)
+const mouseMoved = ref(false)
 
-onMounted(() => {
-  ready.value = true
+const downListener = (event: MouseEvent) => {
+  mouseIsDown.value = true
+  mouseMoved.value = false
+  prevY = event.clientY
+}
+const moveListener = leadingDebounce((event: MouseEvent) => {
+  mouseMoved.value = true
+  if (mouseIsDown.value) {
+    currentY = event.clientY
+    let direction: 'up' | 'down'
+    const curYchange = prevY - currentY
+    // const curAbsolutechange = startY - currentY
+
+    if (curYchange < 0) {
+      direction = 'down'
+    } else {
+      direction = 'up'
+    }
+
+    // console.log(
+    //   `move. direction: ${direction}, curYchange: ${curYchange}, yChange: ${yChange}, prevY: ${prevY}, currentY: ${currentY}`
+    // )
+
+    if (
+      prevY !== currentY &&
+      ((direction === 'up' && controlAngle.value < MAX_ANGLE) ||
+        (direction === 'down' && controlAngle.value > MIN_ANGLE))
+    ) {
+      const change = changeToControlAngle(prevY, curYchange, shiftModifier.value)
+
+      if (controlAngle.value + change < MIN_ANGLE) {
+        controlAngle.value = MIN_ANGLE
+      } else if (controlAngle.value + change > MAX_ANGLE) {
+        controlAngle.value = MAX_ANGLE
+      } else {
+        controlAngle.value += change
+      }
+
+      knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
+    }
+    prevY = currentY
+  }
+})
+
+const upListener = () => {
+  mouseIsDown.value = false
+}
+
+function resetValue() {
+  controlAngle.value = MIN_ANGLE
+}
+
+function setShiftModifier(event: KeyboardEvent) {
+  if (event.key === 'Shift') {
+    shiftModifier.value = true
+  }
+}
+
+function unsetShiftModifier(event: KeyboardEvent) {
+  if (event.key === 'Shift') {
+    shiftModifier.value = false
+  }
+}
+
+watch(
+  () => knob.value,
+  (element) => {
+    if (element) {
+      element.addEventListener('mousedown', downListener)
+      document.addEventListener('mouseup', upListener)
+      document.addEventListener('mousemove', moveListener)
+      document.addEventListener('keydown', setShiftModifier)
+      document.addEventListener('keyup', unsetShiftModifier)
+      knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
+    }
+  }
+)
+
+onBeforeUnmount(() => {
+  console.log('before unmount')
+  knob.value.removeEventListener('mousedown', downListener)
+  document.removeEventListener('mouseup', upListener)
+  document.removeEventListener('mousemove', moveListener)
+  document.removeEventListener('keydown', setShiftModifier)
+  document.removeEventListener('keyup', unsetShiftModifier)
 })
 </script>
-<style>
-.knob {
-  width: --imageSize;
-}
-</style>
 <template>
-  <div>
-    <div>
-      <p>angle: {{ controlAngle }}</p>
-      <input type="range" min="120" max="420" v-model="controlAngle" />
-    </div>
+  <svg
+    :width="imageSize"
+    :height="imageSize"
+    viewBox="0 0 100 100"
+    ref="knob"
+    class="select-none"
+    @click.alt="resetValue"
+  >
+    <circle
+      :cx="HALF_VIEWBOX"
+      :cy="HALF_VIEWBOX"
+      :r="bgRadius"
+      stroke="#868686"
+      fill="#868686"
+      :stroke-width="1"
+    />
 
-    <div>
-      <p>line length: {{ lineLength }}</p>
-      <input type="range" min="1" max="50" v-model="lineLength" />
-    </div>
+    <path
+      :d="rim"
+      :stroke-width="rimStroke"
+      stroke="currentColor"
+      class=""
+      style="color: #393939"
+      fill="none"
+    ></path>
 
-    <div>
-      <p>line offset: {{ lineOffset }}</p>
-      <input type="range" min="-10" max="50" v-model="lineOffset" />
-    </div>
+    <path
+      v-if="controlAngle > 120"
+      :d="valueArch"
+      :stroke-width="valueArchStroke"
+      stroke="currentColor"
+      class=""
+      style="color: #53d769"
+      fill="none"
+    ></path>
 
-    <div>
-      <p>line stroke: {{ lineStroke }}</p>
-      <input type="range" min="1" max="6" v-model="lineStroke" />
-    </div>
+    <line
+      :x1="tickStartX"
+      :y1="tickStartY"
+      :x2="tickEndX"
+      :y2="tickEndY"
+      stroke="black"
+      :stroke-width="lineStroke"
+    />
 
-    <div>
-      <p>rim width: {{ rimWidth }}</p>
-      <input type="range" min="1" max="15" v-model="rimWidth" />
-    </div>
-
-    <div>
-      <p>valueArc width: {{ valueArchWidth }}</p>
-      <input type="range" min="1" max="20" v-model="valueArchWidth" />
-    </div>
-
-    <div>
-      <p>image size: {{ imageSize }}</p>
-      <input type="range" min="40" max="400" v-model="imageSize" />
-    </div>
-  </div>
-
-  <div class="flex flex-row space-x-4 bg-[#575757] p-4">
-    <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500">
-      <circle cx="50" cy="50" :r="RADIUS" stroke="red" fill="#868686" :stroke-width="circleWidth" />
-      <line x1="50" y1="50" :x2="lineEndX" :y2="lineEndY" stroke="black" stroke-width="2" />
-    </svg>
-    <svg :width="100" :height="100" viewBox="0 0 100 100" class="text-red-500 bg-slate-200">
-      <circle
-        cx="50"
-        cy="50"
-        :r="RADIUS"
-        stroke="red"
-        fill="transparent"
-        :stroke-width="circleWidth"
-      />
-      <path
-        :d="line1"
-        :stroke-width="3"
-        stroke="currentColor"
-        class="text-blue-600"
-        fill="transparent"
-      ></path>
-      <path
-        :d="line2"
-        :stroke-width="3"
-        stroke="currentColor"
-        class="text-blue-600"
-        fill="transparent"
-      ></path>
-      <path
-        :d="thirdLine"
-        :stroke-width="1"
-        stroke="currentColor"
-        class="text-red-600"
-        fill="transparent"
-      ></path>
-    </svg>
-    <svg
-      :width="imageSize"
-      :height="imageSize"
-      viewBox="0 0 100 100"
-      class="text-red-500 bg-slate-200"
+    <text
+      v-if="controlAngle > 120"
+      :x="50"
+      :y="62"
+      text-anchor="middle"
+      fill="currentColor"
+      class="text-gray-50 text-[30px] font-normal font-mono"
     >
-      <circle
-        cx="50"
-        cy="50"
-        :r="RADIUS"
-        stroke="red"
-        fill="transparent"
-        :stroke-width="circleWidth"
-      />
-      <line
-        :x1="lineStartX"
-        :y1="lineStartY"
-        :x2="lineEndX"
-        :y2="lineEndY"
-        stroke="black"
-        :stroke-width="lineStroke"
-      />
-    </svg>
-    <svg
-      :width="imageSize"
-      :height="imageSize"
-      viewBox="0 0 100 100"
-      class="text-red-500 bg-slate-200"
-    >
-      <circle
-        cx="50"
-        cy="50"
-        :r="RADIUS"
-        stroke="red"
-        fill="transparent"
-        :stroke-width="circleWidth"
-      />
-      <path
-        :d="rim"
-        :stroke-width="rimWidth"
-        stroke="currentColor"
-        class="text-blue-600"
-        fill="none"
-      ></path>
-
-      <line
-        :x1="lineStartX"
-        :y1="lineStartY"
-        :x2="lineEndX"
-        :y2="lineEndY"
-        stroke="black"
-        :stroke-width="lineStroke"
-      />
-    </svg>
-    <svg :width="imageSize" :height="imageSize" viewBox="0 0 100 100" class="text-red-500">
-      <circle
-        cx="50"
-        cy="50"
-        :r="RADIUS - 6"
-        stroke="#868686"
-        fill="#868686"
-        :stroke-width="circleWidth"
-      />
-
-      <path
-        :d="rim"
-        :stroke-width="rimWidth"
-        stroke="currentColor"
-        class=""
-        style="color: #393939"
-        fill="none"
-      ></path>
-
-      <path
-        v-if="controlAngle > 120"
-        :d="valueArch"
-        :stroke-width="valueArchWidth"
-        stroke="currentColor"
-        class=""
-        style="color: #53d769"
-        fill="none"
-      ></path>
-
-      <line
-        :x1="lineStartX"
-        :y1="lineStartY"
-        :x2="lineEndX"
-        :y2="lineEndY"
-        stroke="black"
-        :stroke-width="lineStroke"
-      />
-
-      <text
-        v-if="controlAngle > 120"
-        :x="50"
-        :y="62"
-        text-anchor="middle"
-        fill="currentColor"
-        class="text-gray-50 text-[30px] font-normal"
-      >
-        {{ parseInt(controlAngle / 10) }}
-      </text>
-    </svg>
-  </div>
-
-  <div>
-    <table>
-      <thead>
-        <th class="w-24 text-left">var</th>
-        <th class="text-left">val</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>cosLine</td>
-          <td>{{ cosLine }}</td>
-        </tr>
-        <tr>
-          <td>sinLine</td>
-          <td>{{ sinLine }}</td>
-        </tr>
-        <tr>
-          <td>thirdLine</td>
-          <td>{{ thirdLine }}</td>
-        </tr>
-        <tr>
-          <td>line</td>
-          <td>{{ lineEndX }}, {{ lineEndY }}</td>
-        </tr>
-        <tr>
-          <td>largeArch</td>
-          <td>{{ largeArch }}</td>
-        </tr>
-        <tr>
-          <td>sweep</td>
-          <td>{{ sweep }}</td>
-        </tr>
-        <tr>
-          <td>rim</td>
-          <td>{{ rim }}</td>
-        </tr>
-        <tr>
-          <td>valueArch</td>
-          <td>{{ valueArch }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+      {{ Math.ceil(knobValue) }}
+    </text>
+  </svg>
 </template>
