@@ -8,6 +8,11 @@ Features:
 - Precice mode w/ shift + movement
 - Supports keyboard, mouse & wheel control
 - Planned: Double-clicking allows manual input
+## Installation
+
+1. Install the package from npm: `yarn add @slipmatio/control-knob`
+1. Import Vue component to your project: `import ControlKnob from 'control-knob`
+
 ## Development
 
 ### Install dependencies

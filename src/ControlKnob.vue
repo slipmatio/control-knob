@@ -5,35 +5,55 @@ import { RADIUS, HALF_VIEWBOX, MIN_ANGLE, MAX_ANGLE } from '@/constants'
 
 const knob = ref<HTMLElement>(0 as unknown as HTMLElement)
 const controlAngle = ref(MIN_ANGLE)
-const tickLength = ref(18)
-const tickOffset = ref(10)
-const lineStroke = ref(3)
-const imageSize = ref(40)
-const rimStroke = ref(11)
-const valueArchStroke = ref(11)
-const bgRadius = ref(34)
-const shiftModifier = ref(false)
-const knobValue = ref(0)
-const knobMinValue = 0
-const knobMaxValue = 100
-const wheelModifierFactor = 10
-const keyModifierFactor = 10
+
+interface Props {
+  options?: {
+    imageSize?: number
+    tickLength?: number
+    tickOffset?: number
+    tickStroke?: number
+    rimStroke?: number
+    valueArchStroke?: number
+    bgRadius?: number
+    minValue?: number
+    maxValue?: number
+    wheelFactor?: number
+    keyFactor?: number
+  }
+}
+
+const props = defineProps<Props>()
+
+const imageSize = props.options?.imageSize || 40
+const tickLength = props.options?.tickLength || 18
+const tickOffset = props.options?.tickOffset || 10
+const tickStroke = props.options?.tickStroke || 3
+const rimStroke = props.options?.rimStroke || 11
+const valueArchStroke = props.options?.valueArchStroke || 11
+const bgRadius = props.options?.bgRadius || 34
+const knobMinValue = props.options?.minValue || 0
+const knobMaxValue = props.options?.maxValue || 100
+const wheelModifierFactor = props.options?.wheelFactor || 10
+const keyModifierFactor = props.options?.keyFactor || 10
+
 const focused = ref(false)
+const knobValue = ref(0)
+const shiftModifier = ref(false)
 
 const tickStartX = computed(() => {
-  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
+  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength)
 })
 
 const tickStartY = computed(() => {
-  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
+  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickLength)
 })
 
 const tickEndX = computed(() => {
-  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickOffset.value)
+  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickOffset)
 })
 
 const tickEndY = computed(() => {
-  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickOffset.value)
+  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickOffset)
 })
 
 const rimStartX = HALF_VIEWBOX + -0.5 * RADIUS
@@ -243,7 +263,7 @@ onBeforeUnmount(() => {
       :x2="tickEndX"
       :y2="tickEndY"
       stroke="black"
-      :stroke-width="lineStroke"
+      :stroke-width="tickStroke"
     />
 
     <text

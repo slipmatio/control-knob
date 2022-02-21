@@ -1,6 +1,6 @@
 {
-  "name": "control-knob",
-  "version": "0.0.1",
+  "name": "@slipmatio/control-knob",
+  "version": "0.1.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
