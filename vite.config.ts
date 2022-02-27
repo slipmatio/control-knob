@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import * as path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -22,7 +21,25 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // @ts-expect-error vitest
   test: {
     include: ['tests/unit/**/*.{test,spec}.ts'],
+  },
+
+  build: {
+    lib: {
+      entry: './src/lib.ts',
+      name: 'ControlKnob',
+      fileName: (format) => `control-knob.${format}.js`,
+    },
+  },
+
+  rollupOptions: {
+    external: ['vue'],
+    output: {
+      globals: {
+        vue: 'Vue',
+      },
+    },
   },
 })
