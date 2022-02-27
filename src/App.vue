@@ -5,27 +5,21 @@ import Designer from './Designer.vue'
 import ControlKnob from './ControlKnob.vue'
 
 const options = {
-  imageSize: 40,
-  tickLength: 18,
-  tickOffset: 10,
-  tickStroke: 3,
-  rimStroke: 11,
-  valueArchStroke: 11,
-  bgRadius: 34,
-  minValue: 0,
-  maxValue: 100,
-  wheelFactor: 10,
-  keyFactor: 10,
-  tabIndex: 0,
-  ariaLabel: 'Knob',
-  valueTextX: 50,
-  valueTexty: 62,
-  showTick: true,
-  showNonDefaultValue: true,
+  imageSize: 80,
+  showValue: false,
+  tickLength: 40,
+  tickOffset: -3,
+  tickStroke: 1,
+  rimStroke: 2,
+  valueArchStroke: 5,
+  bgRadius: 39,
+  tabIndex: 1,
+  rimClass: 'text-black/90',
+  bgClass: 'text-[#36485A]',
+  tickClass: 'text-[#8CE69F]',
 }
 
 const vmodel = ref(0)
-const vmodel2 = ref(0)
 </script>
 <template>
   <div class="p-4 bg-[#575757] text-gray-100">

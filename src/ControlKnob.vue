@@ -58,7 +58,7 @@ const imageSize = props.options?.imageSize || 40
 const knobMinValue = props.options?.minValue || 0
 const knobMaxValue = props.options?.maxValue || 100
 const showTick = props.options?.showTick === undefined ? true : props.options?.showTick
-const showValue = props.options?.showValue || true
+const showValue = props.options?.showValue === undefined ? true : props.options?.showTick
 const showNonDefaultValue = props.options?.showNonDefaultValue || false
 const tickLength = props.options?.tickLength || 18
 const tickOffset = props.options?.tickOffset || 10
