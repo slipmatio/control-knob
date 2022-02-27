@@ -16,14 +16,17 @@ interface Props {
   modelValue: number
   options?: {
     imageSize?: number
+    minValue?: number
+    maxValue?: number
+    showTick?: boolean
+    showValue?: boolean
+    showNonDefaultValue?: boolean
     tickLength?: number
     tickOffset?: number
     tickStroke?: number
     rimStroke?: number
     valueArchStroke?: number
     bgRadius?: number
-    minValue?: number
-    maxValue?: number
     wheelFactor?: number
     keyFactor?: number
     tabIndex?: number
@@ -36,8 +39,6 @@ interface Props {
     valueArchClass?: string
     tickClass?: string
     valueTextClass?: string
-    showTick?: boolean
-    showNondefaultValue?: boolean
   }
 }
 
@@ -54,14 +55,17 @@ const vModel = computed<number>({
 })
 
 const imageSize = props.options?.imageSize || 40
+const knobMinValue = props.options?.minValue || 0
+const knobMaxValue = props.options?.maxValue || 100
+const showTick = props.options?.showTick === undefined ? true : props.options?.showTick
+const showValue = props.options?.showValue || true
+const showNonDefaultValue = props.options?.showNonDefaultValue || false
 const tickLength = props.options?.tickLength || 18
 const tickOffset = props.options?.tickOffset || 10
 const tickStroke = props.options?.tickStroke || 3
 const rimStroke = props.options?.rimStroke || 11
 const valueArchStroke = props.options?.valueArchStroke || 11
 const bgRadius = props.options?.bgRadius || 34
-const knobMinValue = props.options?.minValue || 0
-const knobMaxValue = props.options?.maxValue || 100
 const wheelModifierFactor = props.options?.wheelFactor || 10
 const keyModifierFactor = props.options?.keyFactor || 10
 const tabIndex = props.options?.tabIndex || 0
@@ -75,11 +79,7 @@ const valueArchClass = props.options?.valueArchClass || 'text-[#53d769]'
 const tickClass = props.options?.tickClass || 'text-black'
 const valueTextClass =
   props.options?.valueTextClass || 'text-gray-50 text-[30px] font-normal font-mono'
-const showTick = props.options?.showTick === undefined ? true : props.options?.showTick
-const showNondefaultValue = props.options?.showNondefaultValue || false
 
-const focused = ref(false)
-const shiftModifier = ref(false)
 const startValue = vModel.value
 
 const tickStartX = computed(() => {
@@ -120,7 +120,10 @@ const valueArch = computed(
 let prevY = 0
 let currentY = 0
 const mouseIsDown = ref(false)
+const mouseIsOver = ref(false)
 const mouseMoved = ref(false)
+const hasFocus = ref(false)
+const shiftModifier = ref(false)
 
 const downListener = (event: MouseEvent) => {
   mouseIsDown.value = true
@@ -197,7 +200,7 @@ function keyDownListener(event: KeyboardEvent) {
   }
 
   if (
-    focused.value &&
+    hasFocus.value &&
     shiftModifier.value &&
     (event.key === 'ArrowUp' || event.key === 'ArrowDown')
   ) {
@@ -212,7 +215,7 @@ function keyUpListener(event: KeyboardEvent) {
 
   let newValue: number
   const keyModifier = shiftModifier.value ? 1 : keyModifierFactor
-  if (focused.value && event.key === 'ArrowUp') {
+  if (hasFocus.value && event.key === 'ArrowUp') {
     newValue = controlAngle.value + 1 * keyModifier
     changeValue(newValue)
     if (shiftModifier.value) {
@@ -220,7 +223,7 @@ function keyUpListener(event: KeyboardEvent) {
     }
   }
 
-  if (focused.value && event.key === 'ArrowDown') {
+  if (hasFocus.value && event.key === 'ArrowDown') {
     newValue = controlAngle.value - 1 * keyModifier
     changeValue(newValue)
   }
@@ -237,12 +240,22 @@ function wheelListener(event: WheelEvent) {
   changeValue(newValue)
 }
 
+function mouseOverHandler() {
+  mouseIsOver.value = true
+}
+
+function mouseOutHandler() {
+  mouseIsOver.value = false
+}
+
 watch(
   () => knobElement.value,
   (element, oldElement) => {
     if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
       element.addEventListener('wheel', wheelListener)
+      element.addEventListener('mouseenter', mouseOverHandler)
+      element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
       document.addEventListener('mousemove', debouncedMoveListener)
       document.addEventListener('keydown', keyDownListener)
@@ -254,10 +267,22 @@ watch(
   }
 )
 
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (mouseIsOver.value === false && mouseIsDown.value === false && hasFocus.value === false) {
+      // console.log('propvalue changed for ', knobElement.value.attributes.id)
+      const controlValue = valueToControlAngle(knobMinValue, knobMaxValue, value)
+      controlAngle.value = controlValue
+    }
+  }
+)
+
 onBeforeUnmount(() => {
-  console.log('before unmount')
   knobElement.value.removeEventListener('mousedown', downListener)
   knobElement.value.removeEventListener('wheel', wheelListener)
+  knobElement.value.removeEventListener('mouseenter', mouseOverHandler)
+  knobElement.value.removeEventListener('mouseleave', mouseOutHandler)
   document.removeEventListener('mouseup', upListener)
   document.removeEventListener('mousemove', debouncedMoveListener)
   document.removeEventListener('keydown', keyDownListener)
@@ -278,8 +303,8 @@ onBeforeUnmount(() => {
     :tabindex="tabIndex"
     :class="svgClass"
     @click.alt="resetValue"
-    @focus="focused = true"
-    @blur="focused = false"
+    @focus="hasFocus = true"
+    @blur="hasFocus = false"
   >
     <circle
       :cx="HALF_VIEWBOX"
@@ -320,7 +345,7 @@ onBeforeUnmount(() => {
     />
 
     <text
-      v-if="showNondefaultValue || startValue !== vModel"
+      v-if="showValue && (showNonDefaultValue || startValue !== vModel)"
       :x="valueTextX"
       :y="valueTextY"
       text-anchor="middle"

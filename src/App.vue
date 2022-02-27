@@ -21,18 +21,25 @@ const options = {
   valueTextX: 50,
   valueTexty: 62,
   showTick: true,
-  showNondefaultValue: true,
+  showNonDefaultValue: true,
 }
 
-const vmodel = ref(100)
+const vmodel = ref(0)
+const vmodel2 = ref(0)
 </script>
 <template>
   <div class="p-4 bg-[#575757] text-gray-100">
     <div>
-      <h2 class="mb-6 text-3xl font-semibold">Control Knob</h2>
+      <h2 class="mb-6 text-xl font-semibold">Default Control Knob</h2>
 
-      <div class="p-8">
-        <ControlKnob v-model="vmodel" :options="options" />
+      <div class="px-8">
+        <ControlKnob id="knob1" v-model="vmodel" />
+      </div>
+
+      <h2 class="my-6 text-xl font-semibold">Modified Control Knob</h2>
+
+      <div class="px-8">
+        <ControlKnob id="knob2" v-model="vmodel" :options="options" />
       </div>
     </div>
     <div v-if="false">
