@@ -16,14 +16,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite build --config ./vite.test.config.ts && vite preview --port 3000 --config ./vite.test.config.ts",
+    "preview": "vite build --config ./vite.test.config.ts && vite preview --port 3001 --config ./vite.test.config.ts",
     "start": "yarn dev & wait-on tcp:3000 -v",
     "test": "vitest",
     "test-e2e": "cypress open",
     "test-e2e-headless": "cypress run --headless",
     "test-components": "cypress open-ct",
     "test:ci": "vitest run --coverage",
-    "test:ci-e2e": "start-server-and-test 'yarn preview' http://localhost:3000/ 'yarn test-e2e-headless'",
+    "test:ci-e2e": "start-server-and-test 'yarn preview' http://localhost:3001/ 'yarn test-e2e-headless'",
     "test:ci-components": "cypress run-ct",
     "coverage": "vitest run --coverage",
     "report": "nyc report --reporter=text-summary"
