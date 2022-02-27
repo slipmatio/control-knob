@@ -39,7 +39,9 @@ jobs:
         run: yarn test:ci-components
 
       - name: Run e2e tests
-        run: yarn test:ci-e2e
+        run: |
+          yarn test:ci-e2e
+          yarn coverage
 
       - name: Upload artifacts on fail
         uses: actions/upload-artifact@v2
