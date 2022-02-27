@@ -39,7 +39,7 @@ jobs:
         run: yarn test:ci-components
 
       - name: Run e2e tests
-        run: \
+        run: |
           yarn test:ci-e2e
           yarn coverage
 
