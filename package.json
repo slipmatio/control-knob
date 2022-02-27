@@ -1,6 +1,6 @@
 {
   "name": "@slipmatio/control-knob",
-  "version": "0.0.0-alpha.1",
+  "version": "0.0.0-alpha.2",
   "main": "dist/index.es.js",
   "module": "dist/index.es.js",
   "exports": {
@@ -70,7 +70,7 @@
     "dist/index.umd.js",
     "dist/index.umd.js.map",
     "dist/src/constants.d.ts",
-    "dist/src/ControlKnob.d.ts",
+    "dist/src/ControlKnob.vue.d.ts",
     "dist/src/lib.d.ts",
     "dist/src/utils.d.ts",
     "README.md",
