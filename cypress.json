@@ -9,5 +9,6 @@
   "component": {
     "componentFolder": "tests/component",
     "testFiles": "**/*spec.ts"
-  }
+  },
+  "coverage": true
 }

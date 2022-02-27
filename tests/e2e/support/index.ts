@@ -15,6 +15,7 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
+import '@cypress/code-coverage/support'
 import './commands'
 
 Cypress.on('window:before:load', (win) => {
