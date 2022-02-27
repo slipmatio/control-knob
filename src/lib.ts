@@ -1,3 +1,3 @@
 import ControlKnob from './ControlKnob.vue'
 
-export { ControlKnob }
+export default ControlKnob

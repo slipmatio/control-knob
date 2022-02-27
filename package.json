@@ -1,6 +1,6 @@
 {
   "name": "@slipmatio/control-knob",
-  "version": "0.0.0-alpha.2",
+  "version": "0.0.1",
   "main": "dist/index.es.js",
   "module": "dist/index.es.js",
   "exports": {

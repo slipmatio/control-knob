@@ -20,7 +20,7 @@ interface Props {
     maxValue?: number
     showTick?: boolean
     showValue?: boolean
-    showNonDefaultValue?: boolean
+    hideDefaultValue?: boolean
     tickLength?: number
     tickOffset?: number
     tickStroke?: number
@@ -59,7 +59,8 @@ const knobMinValue = props.options?.minValue || 0
 const knobMaxValue = props.options?.maxValue || 100
 const showTick = props.options?.showTick === undefined ? true : props.options?.showTick
 const showValue = props.options?.showValue === undefined ? true : props.options?.showTick
-const showNonDefaultValue = props.options?.showNonDefaultValue || false
+const hideDefaultValue =
+  props.options?.hideDefaultValue === undefined ? true : props.options?.hideDefaultValue
 const tickLength = props.options?.tickLength || 18
 const tickOffset = props.options?.tickOffset || 10
 const tickStroke = props.options?.tickStroke || 3
@@ -345,7 +346,7 @@ onBeforeUnmount(() => {
     />
 
     <text
-      v-if="showValue && (showNonDefaultValue || startValue !== vModel)"
+      v-if="showValue && (!hideDefaultValue || startValue !== vModel)"
       :x="valueTextX"
       :y="valueTextY"
       text-anchor="middle"
