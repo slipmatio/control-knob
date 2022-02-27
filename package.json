@@ -10,7 +10,7 @@
     "test-e2e": "cypress open",
     "test-components": "cypress open-ct",
     "test:ci": "vitest run --coverage",
-    "test:ci-e2e": "cypress --headless",
+    "test:ci-e2e": "cypress run --headless",
     "test:ci-components": "cypress run-ct",
     "coverage": "vitest run --coverage"
   },
