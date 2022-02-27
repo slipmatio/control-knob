@@ -1,39 +1,101 @@
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from 'vue'
-import { degToRad, leadingDebounce, changeToControlAngle, controlAngleToValue } from '@/utils'
+import {
+  degToRad,
+  leadingDebounce,
+  changeToControlAngle,
+  controlAngleToValue,
+  valueToControlAngle,
+} from '@/utils'
 import { RADIUS, HALF_VIEWBOX, MIN_ANGLE, MAX_ANGLE } from '@/constants'
 
-const knob = ref<HTMLElement>(0 as unknown as HTMLElement)
+const knobElement = ref<HTMLElement>(0 as unknown as HTMLElement)
 const controlAngle = ref(MIN_ANGLE)
-const tickLength = ref(18)
-const tickOffset = ref(10)
-const lineStroke = ref(3)
-const imageSize = ref(40)
-const rimStroke = ref(11)
-const valueArchStroke = ref(11)
-const bgRadius = ref(34)
-const shiftModifier = ref(false)
-const knobValue = ref(0)
-const knobMinValue = 0
-const knobMaxValue = 100
-const wheelModifierFactor = 10
-const keyModifierFactor = 10
-const focused = ref(false)
+
+interface Props {
+  modelValue: number
+  options?: {
+    imageSize?: number
+    minValue?: number
+    maxValue?: number
+    showTick?: boolean
+    showValue?: boolean
+    showNonDefaultValue?: boolean
+    tickLength?: number
+    tickOffset?: number
+    tickStroke?: number
+    rimStroke?: number
+    valueArchStroke?: number
+    bgRadius?: number
+    wheelFactor?: number
+    keyFactor?: number
+    tabIndex?: number
+    ariaLabel?: string
+    valueTextX?: number
+    valueTextY?: number
+    svgClass?: string
+    bgClass?: string
+    rimClass?: string
+    valueArchClass?: string
+    tickClass?: string
+    valueTextClass?: string
+  }
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits(['update:modelValue'])
+
+const vModel = computed<number>({
+  get() {
+    return props.modelValue
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  },
+})
+
+const imageSize = props.options?.imageSize || 40
+const knobMinValue = props.options?.minValue || 0
+const knobMaxValue = props.options?.maxValue || 100
+const showTick = props.options?.showTick === undefined ? true : props.options?.showTick
+const showValue = props.options?.showValue === undefined ? true : props.options?.showTick
+const showNonDefaultValue = props.options?.showNonDefaultValue || false
+const tickLength = props.options?.tickLength || 18
+const tickOffset = props.options?.tickOffset || 10
+const tickStroke = props.options?.tickStroke || 3
+const rimStroke = props.options?.rimStroke || 11
+const valueArchStroke = props.options?.valueArchStroke || 11
+const bgRadius = props.options?.bgRadius || 34
+const wheelModifierFactor = props.options?.wheelFactor || 10
+const keyModifierFactor = props.options?.keyFactor || 10
+const tabIndex = props.options?.tabIndex || 0
+const ariaLabel = props.options?.ariaLabel || 'Knob'
+const valueTextX = props.options?.valueTextX || 50
+const valueTextY = props.options?.valueTextY || 62
+const svgClass = props.options?.svgClass || 'select-none'
+const bgClass = props.options?.bgClass || 'text-[#868686]'
+const rimClass = props.options?.rimClass || 'text-[#393939]'
+const valueArchClass = props.options?.valueArchClass || 'text-[#53d769]'
+const tickClass = props.options?.tickClass || 'text-black'
+const valueTextClass =
+  props.options?.valueTextClass || 'text-gray-50 text-[30px] font-normal font-mono'
+
+const startValue = vModel.value
 
 const tickStartX = computed(() => {
-  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
+  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength)
 })
 
 const tickStartY = computed(() => {
-  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickLength.value)
+  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickLength)
 })
 
 const tickEndX = computed(() => {
-  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickOffset.value)
+  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickOffset)
 })
 
 const tickEndY = computed(() => {
-  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickOffset.value)
+  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickOffset)
 })
 
 const rimStartX = HALF_VIEWBOX + -0.5 * RADIUS
@@ -58,14 +120,18 @@ const valueArch = computed(
 let prevY = 0
 let currentY = 0
 const mouseIsDown = ref(false)
+const mouseIsOver = ref(false)
 const mouseMoved = ref(false)
+const hasFocus = ref(false)
+const shiftModifier = ref(false)
 
 const downListener = (event: MouseEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
   prevY = event.clientY
 }
-const moveListener = leadingDebounce((event: MouseEvent) => {
+
+function moveListener(event: MouseEvent) {
   mouseMoved.value = true
   if (mouseIsDown.value) {
     currentY = event.clientY
@@ -93,11 +159,13 @@ const moveListener = leadingDebounce((event: MouseEvent) => {
         controlAngle.value += change
       }
 
-      knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
+      vModel.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
     }
     prevY = currentY
   }
-})
+}
+
+const debouncedMoveListener = leadingDebounce(moveListener)
 
 const upListener = () => {
   mouseIsDown.value = false
@@ -108,17 +176,22 @@ function resetValue() {
 }
 
 function changeValue(change: number) {
-  if (change < MAX_ANGLE) {
-    controlAngle.value = change
-  } else {
-    controlAngle.value = MAX_ANGLE
+  if (change > controlAngle.value) {
+    if (change < MAX_ANGLE) {
+      controlAngle.value = change
+    } else {
+      controlAngle.value = MAX_ANGLE
+    }
   }
-  if (change > MIN_ANGLE) {
-    controlAngle.value = change
-  } else {
-    controlAngle.value = MIN_ANGLE
+
+  if (change < controlAngle.value) {
+    if (change < controlAngle.value && change > MIN_ANGLE) {
+      controlAngle.value = change
+    } else {
+      controlAngle.value = MIN_ANGLE
+    }
   }
-  knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
+  vModel.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
 }
 
 function keyDownListener(event: KeyboardEvent) {
@@ -127,7 +200,7 @@ function keyDownListener(event: KeyboardEvent) {
   }
 
   if (
-    focused.value &&
+    hasFocus.value &&
     shiftModifier.value &&
     (event.key === 'ArrowUp' || event.key === 'ArrowDown')
   ) {
@@ -142,7 +215,7 @@ function keyUpListener(event: KeyboardEvent) {
 
   let newValue: number
   const keyModifier = shiftModifier.value ? 1 : keyModifierFactor
-  if (focused.value && event.key === 'ArrowUp') {
+  if (hasFocus.value && event.key === 'ArrowUp') {
     newValue = controlAngle.value + 1 * keyModifier
     changeValue(newValue)
     if (shiftModifier.value) {
@@ -150,7 +223,7 @@ function keyUpListener(event: KeyboardEvent) {
     }
   }
 
-  if (focused.value && event.key === 'ArrowDown') {
+  if (hasFocus.value && event.key === 'ArrowDown') {
     newValue = controlAngle.value - 1 * keyModifier
     changeValue(newValue)
   }
@@ -167,27 +240,51 @@ function wheelListener(event: WheelEvent) {
   changeValue(newValue)
 }
 
+function mouseOverHandler() {
+  mouseIsOver.value = true
+}
+
+function mouseOutHandler() {
+  mouseIsOver.value = false
+}
+
 watch(
-  () => knob.value,
-  (element) => {
-    if (element) {
+  () => knobElement.value,
+  (element, oldElement) => {
+    if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
       element.addEventListener('wheel', wheelListener)
+      element.addEventListener('mouseenter', mouseOverHandler)
+      element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
-      document.addEventListener('mousemove', moveListener)
+      document.addEventListener('mousemove', debouncedMoveListener)
       document.addEventListener('keydown', keyDownListener)
       document.addEventListener('keyup', keyUpListener)
-      knobValue.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
+
+      const controlValue = valueToControlAngle(knobMinValue, knobMaxValue, props.modelValue)
+      controlAngle.value = controlValue
+    }
+  }
+)
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (mouseIsOver.value === false && mouseIsDown.value === false && hasFocus.value === false) {
+      // console.log('propvalue changed for ', knobElement.value.attributes.id)
+      const controlValue = valueToControlAngle(knobMinValue, knobMaxValue, value)
+      controlAngle.value = controlValue
     }
   }
 )
 
 onBeforeUnmount(() => {
-  console.log('before unmount')
-  knob.value.removeEventListener('mousedown', downListener)
-  knob.value.removeEventListener('wheel', wheelListener)
+  knobElement.value.removeEventListener('mousedown', downListener)
+  knobElement.value.removeEventListener('wheel', wheelListener)
+  knobElement.value.removeEventListener('mouseenter', mouseOverHandler)
+  knobElement.value.removeEventListener('mouseleave', mouseOutHandler)
   document.removeEventListener('mouseup', upListener)
-  document.removeEventListener('mousemove', moveListener)
+  document.removeEventListener('mousemove', debouncedMoveListener)
   document.removeEventListener('keydown', keyDownListener)
   document.removeEventListener('keyup', keyUpListener)
 })
@@ -197,24 +294,25 @@ onBeforeUnmount(() => {
     :width="imageSize"
     :height="imageSize"
     viewBox="0 0 100 100"
-    ref="knob"
-    @click.alt="resetValue"
+    ref="knobElement"
     role="slider"
-    aria-label="Knob"
+    :aria-label="ariaLabel"
     :aria-valuemin="knobMinValue"
     :aria-valuemax="knobMaxValue"
-    :aria-valuenow="knobValue"
-    class="select-none focus:outline-none focus:ring-2 focus:ring-green-500"
-    tabindex="0"
-    @focus="focused = true"
-    @blur="focused = false"
+    :aria-valuenow="vModel"
+    :tabindex="tabIndex"
+    :class="svgClass"
+    @click.alt="resetValue"
+    @focus="hasFocus = true"
+    @blur="hasFocus = false"
   >
     <circle
       :cx="HALF_VIEWBOX"
       :cy="HALF_VIEWBOX"
       :r="bgRadius"
-      stroke="#868686"
-      fill="#868686"
+      stroke="currentColor"
+      fill="currentColor"
+      :class="bgClass"
       :stroke-width="1"
     />
 
@@ -222,9 +320,8 @@ onBeforeUnmount(() => {
       :d="rim"
       :stroke-width="rimStroke"
       stroke="currentColor"
-      class=""
-      style="color: #393939"
       fill="none"
+      :class="rimClass"
     ></path>
 
     <path
@@ -232,29 +329,30 @@ onBeforeUnmount(() => {
       :d="valueArch"
       :stroke-width="valueArchStroke"
       stroke="currentColor"
-      class=""
-      style="color: #53d769"
       fill="none"
+      :class="valueArchClass"
     ></path>
 
     <line
+      v-if="showTick"
       :x1="tickStartX"
       :y1="tickStartY"
       :x2="tickEndX"
       :y2="tickEndY"
-      stroke="black"
-      :stroke-width="lineStroke"
+      stroke="currentColor"
+      :stroke-width="tickStroke"
+      :class="tickClass"
     />
 
     <text
-      v-if="controlAngle > 120"
-      :x="50"
-      :y="62"
+      v-if="showValue && (showNonDefaultValue || startValue !== vModel)"
+      :x="valueTextX"
+      :y="valueTextY"
       text-anchor="middle"
       fill="currentColor"
-      class="text-gray-50 text-[30px] font-normal font-mono"
+      :class="valueTextClass"
     >
-      {{ Math.ceil(knobValue) }}
+      {{ Math.ceil(vModel) }}
     </text>
   </svg>
 </template>

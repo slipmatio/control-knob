@@ -44,3 +44,18 @@ export function controlAngleToValue(minValue: number, maxValue: number, controlA
   }
   return minValue + valueRange * controlPercentage
 }
+
+export function valueToControlAngle(minValue: number, maxValue: number, value: number) {
+  let valuePercentage: number
+  const controlRange = MAX_ANGLE - MIN_ANGLE
+  const valueRange = maxValue - minValue
+
+  if (value === minValue) {
+    valuePercentage = 0
+  } else if (value === maxValue) {
+    valuePercentage = 1
+  } else {
+    valuePercentage = (value - minValue) / valueRange
+  }
+  return MIN_ANGLE + controlRange * valuePercentage
+}

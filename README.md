@@ -2,12 +2,16 @@
 
 Features:
 
-- Works as close as possible to native controls like on Ableton Live or Logic Pro
+- Works as close as possible to native controls like in Logic Pro or Ableton Live
 - Moves only with vertical mouse movement
 - Option-click (alt-click) resets the value to default
 - Precice mode w/ shift + movement
-- Supports mouse & wheel
-- Planned: Double-clicking allows manual input
+- Supports keyboard, mouse & wheel control
+## Installation
+
+1. Install the package from npm: `yarn add @slipmatio/control-knob`
+1. Import Vue component to your project: `import ControlKnob from 'control-knob`
+
 ## Development
 
 ### Install dependencies
