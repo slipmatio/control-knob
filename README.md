@@ -18,7 +18,7 @@ Rotary control knob component for Vue 3 that behaves like native audio app contr
 ## Installation
 
 1. Install the package from npm: `yarn add @slipmatio/control-knob`
-1. Import Vue component to your project: `import ControlKnob from '@slipmatio/control-knob`
+1. Import Vue component to your project: `import ControlKnob from '@slipmatio/control-knob'`
 2. Configure v-model and options
 
 ### Configuration
@@ -53,7 +53,7 @@ All configuration options are optional. The options referencing inner coordinate
 | valueTextClass | 'text-gray-50 text-[30px] font-normal font-mono' | CSS class for the value text. |
 
 
-**Note** that if you're using Tailwind CSS with automatic purge, you'll probably want to add the default classes as options so PurgeCSS catches them (or you can just whutelist them):
+**Note** that if you're using Tailwind CSS with automatic purge, you'll probably want to add the default classes as options so PurgeCSS catches them (or you can just whitelist them):
 
 Default Tailwind CSS classes:
 
