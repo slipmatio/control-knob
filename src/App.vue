@@ -35,6 +35,14 @@ const vmodel = ref(0)
       <div class="px-8">
         <ControlKnob id="knob2" v-model="vmodel" :options="options" />
       </div>
+
+      <h2 class="my-6 text-xl font-semibold">Modified Control Knob with text display function</h2>
+
+      <div class="px-8">
+        <ControlKnob id="knob2" v-model="vmodel" :options="{
+            valueDisplayFunction: () => {return vmodel.toFixed(1)+ '%'}
+            }" />
+      </div>
     </div>
     <div v-if="false">
       <h2 class="mb-6 text-3xl font-semibold">Knob Designer</h2>

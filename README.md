@@ -1,3 +1,7 @@
+# About this fork
+This fork intends to add some specific, but useful Features
+- Text display function
+
 # Vue Control Knob
 
 Rotary control knob component for Vue 3 that behaves like native audio app controls in Logic Pro or Ableton Live. Component is fully customizable and rendered as an ARIA-friendly SVG element.
@@ -51,6 +55,8 @@ All configuration options are optional. The options referencing inner coordinate
 | valueArchClass | 'text-[#53d769]' | CSS class for the value arch. |
 | tickClass | 'text-black' | CSS class for the tick line. |
 | valueTextClass | 'text-gray-50 text-[30px] font-normal font-mono' | CSS class for the value text. |
+| valueDisplayFunction | 'Math.ceil(vmodel).toString()' | Custom function to alter the display text |  
+
 
 
 **Note** that if you're using Tailwind CSS with automatic purge, you'll probably want to add the default classes as options so PurgeCSS catches them (or you can just whitelist them):
