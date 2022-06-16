@@ -156,6 +156,12 @@ const downListener = (event: MouseEvent) => {
   prevY = event.clientY
 }
 
+const touchDownListener = (event: TouchEvent) => {
+  mouseIsDown.value = true
+  mouseMoved.value = false
+  prevY = event.touches[0].pageY
+}
+
 function moveListener(event: MouseEvent) {
   mouseMoved.value = true
   if (mouseIsDown.value) {
@@ -198,7 +204,50 @@ function moveListener(event: MouseEvent) {
   }
 }
 
+function touchMoveListener(event: TouchEvent) {
+  mouseMoved.value = true
+  if (mouseIsDown.value) {
+    currentY = event.touches[0].pageY
+    let direction: 'up' | 'down'
+    const curYchange = prevY - currentY
+
+    if (curYchange < 0) {
+      direction = 'down'
+    } else {
+      direction = 'up'
+    }
+
+    if (
+      prevY !== currentY &&
+      ((direction === 'up' && controlAngle.value < MAX_ANGLE) ||
+        (direction === 'down' && controlAngle.value > MIN_ANGLE))
+    ) {
+      const change = changeToControlAngle(
+        prevY,
+        curYchange,
+        shiftModifier.value
+      )
+
+      if (controlAngle.value + change < MIN_ANGLE) {
+        controlAngle.value = MIN_ANGLE
+      } else if (controlAngle.value + change > MAX_ANGLE) {
+        controlAngle.value = MAX_ANGLE
+      } else {
+        controlAngle.value += change
+      }
+
+      vModel.value = controlAngleToValue(
+        knobMinValue,
+        knobMaxValue,
+        controlAngle.value
+      )
+    }
+    prevY = currentY
+  }
+}
+
 const debouncedMoveListener = leadingDebounce(moveListener)
+const debouncedTouchMoveListener = leadingDebounce(touchMoveListener)
 
 const upListener = () => {
   mouseIsDown.value = false
@@ -302,11 +351,14 @@ watch(
   (element, oldElement) => {
     if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
+      element.addEventListener('touchstart', touchDownListener)
       element.addEventListener('wheel', wheelListener)
       element.addEventListener('mouseenter', mouseOverHandler)
       element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
+      document.addEventListener('touchend', upListener)
       document.addEventListener('mousemove', debouncedMoveListener)
+      document.addEventListener('touchmove', debouncedTouchMoveListener)
       document.addEventListener('keydown', keyDownListener)
       document.addEventListener('keyup', keyUpListener)
 
@@ -341,11 +393,14 @@ watch(
 
 onBeforeUnmount(() => {
   knobElement.value.removeEventListener('mousedown', downListener)
+  knobElement.value.removeEventListener('touchstart', touchDownListener)
   knobElement.value.removeEventListener('wheel', wheelListener)
   knobElement.value.removeEventListener('mouseenter', mouseOverHandler)
   knobElement.value.removeEventListener('mouseleave', mouseOutHandler)
   document.removeEventListener('mouseup', upListener)
+  document.removeEventListener('touchend', upListener)
   document.removeEventListener('mousemove', debouncedMoveListener)
+  document.removeEventListener('touchmove', debouncedTouchMoveListener)
   document.removeEventListener('keydown', keyDownListener)
   document.removeEventListener('keyup', keyUpListener)
 })
