@@ -150,64 +150,26 @@ const mouseMoved = ref(false)
 const hasFocus = ref(false)
 const shiftModifier = ref(false)
 
-const downListener = (event: MouseEvent) => {
+const downListener = (event: MouseEvent | TouchEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
-  prevY = event.clientY
+  prevY = getEventY(event);
 }
-
-const touchDownListener = (event: TouchEvent) => {
-  mouseIsDown.value = true
-  mouseMoved.value = false
-  prevY = event.touches[0].pageY
-}
-
-function moveListener(event: MouseEvent) {
-  mouseMoved.value = true
-  if (mouseIsDown.value) {
-    currentY = event.clientY
-    let direction: 'up' | 'down'
-    const curYchange = prevY - currentY
-
-    if (curYchange < 0) {
-      direction = 'down'
-    } else {
-      direction = 'up'
-    }
-
-    if (
-      prevY !== currentY &&
-      ((direction === 'up' && controlAngle.value < MAX_ANGLE) ||
-        (direction === 'down' && controlAngle.value > MIN_ANGLE))
-    ) {
-      const change = changeToControlAngle(
-        prevY,
-        curYchange,
-        shiftModifier.value
-      )
-
-      if (controlAngle.value + change < MIN_ANGLE) {
-        controlAngle.value = MIN_ANGLE
-      } else if (controlAngle.value + change > MAX_ANGLE) {
-        controlAngle.value = MAX_ANGLE
-      } else {
-        controlAngle.value += change
-      }
-
-      vModel.value = controlAngleToValue(
-        knobMinValue,
-        knobMaxValue,
-        controlAngle.value
-      )
-    }
-    prevY = currentY
+ /** Gets the y coordinate associated with the event */
+function getEventY(event: TouchEvent | MouseEvent): number {
+  if (event instanceof TouchEvent) {
+    return event.touches[0].pageY;
   }
+  else if (event instanceof MouseEvent) {
+    return currentY = event.clientY
+  }
+  return 0;
 }
 
-function touchMoveListener(event: TouchEvent) {
+function moveListener(event: TouchEvent | MouseEvent) {
   mouseMoved.value = true
   if (mouseIsDown.value) {
-    currentY = event.touches[0].pageY
+    currentY = getEventY(event);
     let direction: 'up' | 'down'
     const curYchange = prevY - currentY
 
@@ -247,7 +209,7 @@ function touchMoveListener(event: TouchEvent) {
 }
 
 const debouncedMoveListener = leadingDebounce(moveListener)
-const debouncedTouchMoveListener = leadingDebounce(touchMoveListener)
+//const debouncedTouchMoveListener = leadingDebounce(moveListener)
 
 const upListener = () => {
   mouseIsDown.value = false
@@ -351,14 +313,14 @@ watch(
   (element, oldElement) => {
     if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
-      element.addEventListener('touchstart', touchDownListener)
+      element.addEventListener('touchstart', downListener)
       element.addEventListener('wheel', wheelListener)
       element.addEventListener('mouseenter', mouseOverHandler)
       element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
       document.addEventListener('touchend', upListener)
       document.addEventListener('mousemove', debouncedMoveListener)
-      document.addEventListener('touchmove', debouncedTouchMoveListener)
+      document.addEventListener('touchmove', debouncedMoveListener)
       document.addEventListener('keydown', keyDownListener)
       document.addEventListener('keyup', keyUpListener)
 
@@ -393,14 +355,14 @@ watch(
 
 onBeforeUnmount(() => {
   knobElement.value.removeEventListener('mousedown', downListener)
-  knobElement.value.removeEventListener('touchstart', touchDownListener)
+  knobElement.value.removeEventListener('touchstart', downListener)
   knobElement.value.removeEventListener('wheel', wheelListener)
   knobElement.value.removeEventListener('mouseenter', mouseOverHandler)
   knobElement.value.removeEventListener('mouseleave', mouseOutHandler)
   document.removeEventListener('mouseup', upListener)
   document.removeEventListener('touchend', upListener)
   document.removeEventListener('mousemove', debouncedMoveListener)
-  document.removeEventListener('touchmove', debouncedTouchMoveListener)
+  document.removeEventListener('touchmove', debouncedMoveListener)
   document.removeEventListener('keydown', keyDownListener)
   document.removeEventListener('keyup', keyUpListener)
 })
