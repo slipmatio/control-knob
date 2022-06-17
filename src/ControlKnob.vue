@@ -209,7 +209,6 @@ function moveListener(event: TouchEvent | MouseEvent) {
 }
 
 const debouncedMoveListener = leadingDebounce(moveListener)
-//const debouncedTouchMoveListener = leadingDebounce(moveListener)
 
 const upListener = () => {
   mouseIsDown.value = false
@@ -243,16 +242,18 @@ function changeValue(change: number) {
 }
 
 function keyDownListener(event: KeyboardEvent) {
+  //Update the shift modifier here already, otherwise the precise mode is not triggered properly
   if (event.key === 'Shift') {
     shiftModifier.value = true
   }
 
   if (
     hasFocus.value &&
-    shiftModifier.value &&
     (event.key === 'ArrowUp' || event.key === 'ArrowDown')
   ) {
-    event.preventDefault()
+    //Do not propagate event further (prevent page scrolling while handling the knob)
+    event.preventDefault();
+    event.stopPropagation();
   }
 }
 
@@ -266,9 +267,6 @@ function keyUpListener(event: KeyboardEvent) {
   if (hasFocus.value && event.key === 'ArrowUp') {
     newValue = controlAngle.value + 1 * keyModifier
     changeValue(newValue)
-    if (shiftModifier.value) {
-      event.stopPropagation()
-    }
   }
 
   if (hasFocus.value && event.key === 'ArrowDown') {
@@ -289,6 +287,10 @@ function wheelListener(event: WheelEvent) {
     newValue = controlAngle.value - 1 * wheelModifier
   }
   changeValue(newValue)
+
+  //Do not propagate event further (prevent page scrolling while handling the knob)
+  event.preventDefault();
+  event.stopPropagation();
 }
 
 function mouseOverHandler() {

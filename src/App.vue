@@ -43,6 +43,12 @@ const vmodel = ref(0)
             valueDisplayFunction: () => {return vmodel.toFixed(1)+ '%'}
             }" />
       </div>
+
+      <h2 class="my-6 text-xl font-semibold">A standard text input, for comparison</h2>
+
+      <div class="px-8">
+        <input class="bg-black" type="number" v-model="vmodel" />  {{vmodel}}
+      </div>
     </div>
     <div v-if="false">
       <h2 class="mb-6 text-3xl font-semibold">Knob Designer</h2>
