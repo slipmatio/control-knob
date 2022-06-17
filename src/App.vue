@@ -41,6 +41,8 @@ const vmodel = ref(0)
       <div class="px-8">
         <ControlKnob id="knob2" v-model="vmodel" :options="{
             imageSize: 80,
+            valueTextClass: 'text-[20px]',
+            hideDefaultValue: false,
             valueDisplayFunction: () => {return vmodel.toFixed(1)+ '%'}
             }" />
       </div>

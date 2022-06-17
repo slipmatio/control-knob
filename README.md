@@ -1,6 +1,8 @@
 # About this fork
-This fork intends to add some specific, but useful Features
-- Text display function
+This fork intends to add some specific, useful Features
+- Text display template function
+- Prevents page scrolling when interacting with the knob
+- Touch move support
 
 # Vue Control Knob
 
