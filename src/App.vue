@@ -40,6 +40,7 @@ const vmodel = ref(0)
 
       <div class="px-8">
         <ControlKnob id="knob2" v-model="vmodel" :options="{
+            imageSize: 80,
             valueDisplayFunction: () => {return vmodel.toFixed(1)+ '%'}
             }" />
       </div>
@@ -47,7 +48,7 @@ const vmodel = ref(0)
       <h2 class="my-6 text-xl font-semibold">A standard text input, for comparison</h2>
 
       <div class="px-8">
-        <input class="bg-black" type="number" v-model="vmodel" />  {{vmodel}}
+        <input class="bg-black" type="number" v-model="vmodel" /> 
       </div>
     </div>
     <div v-if="false">
