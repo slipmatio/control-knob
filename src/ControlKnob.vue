@@ -150,6 +150,9 @@ const mouseMoved = ref(false)
 const hasFocus = ref(false)
 const shiftModifier = ref(false)
 
+/** Handles mouse and touch down events
+ * @remarks Must be called non-passive, as it is actually calling preventDefault()
+ */
 const downListener = (event: MouseEvent | TouchEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
@@ -215,10 +218,7 @@ function moveListener(event: TouchEvent | MouseEvent) {
       )
     }
     prevY = currentY
-
-
   }
-  preventScrolling(event);
 }
 
 const debouncedMoveListener = leadingDebounce(moveListener)
@@ -286,6 +286,9 @@ function keyUpListener(event: KeyboardEvent) {
   }
 }
 
+/** Handles mouse and touch down events
+ * @remarks Must be called non-passive, as it is actually calling preventDefault()
+ */
 function wheelListener(event: WheelEvent) {
   let newValue: number
   const wheelModifier = event.shiftKey ? 1 : wheelModifierFactor
@@ -322,15 +325,15 @@ watch(
   () => knobElement.value,
   (element, oldElement) => {
     if (element && !oldElement) {
-      element.addEventListener('mousedown', downListener)
-      element.addEventListener('touchstart', downListener)
+      element.addEventListener('mousedown', downListener, {capture: false})
+      element.addEventListener('touchstart', downListener, {capture: false})
       element.addEventListener('wheel', wheelListener)
       element.addEventListener('mouseenter', mouseOverHandler)
       element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
       document.addEventListener('touchend', upListener)
-      document.addEventListener('mousemove', debouncedMoveListener)
-      document.addEventListener('touchmove', debouncedMoveListener)
+      document.addEventListener('mousemove', debouncedMoveListener, true)
+      document.addEventListener('touchmove', debouncedMoveListener, true)
       document.addEventListener('keydown', keyDownListener)
       document.addEventListener('keyup', keyUpListener)
 
