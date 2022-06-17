@@ -170,7 +170,7 @@ function preventScrolling(event: TouchEvent | MouseEvent | KeyboardEvent): void 
 
  /** Gets the y coordinate associated with the event */
 function getEventY(event: TouchEvent | MouseEvent): number {
-  if (event instanceof TouchEvent) {
+  if (window.TouchEvent && event instanceof TouchEvent) {
     return event.touches[0].pageY;
   }
   else if (event instanceof MouseEvent) {
