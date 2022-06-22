@@ -263,7 +263,8 @@ watch(
   (element, oldElement) => {
     if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
-      element.addEventListener('wheel', wheelListener)
+      // Note: The wheel event is actually non-passive, since it does manipulate scrolling behaviour
+      element.addEventListener('wheel', wheelListener, { passive: false } )
       element.addEventListener('mouseenter', mouseOverHandler)
       element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
