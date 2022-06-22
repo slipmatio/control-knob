@@ -130,6 +130,7 @@ const downListener = (event: MouseEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
   prevY = event.clientY
+  preventScrolling(event);
 }
 
 function moveListener(event: MouseEvent) {
@@ -168,6 +169,14 @@ function moveListener(event: MouseEvent) {
 
 const debouncedMoveListener = leadingDebounce(moveListener)
 
+/** Prevents propagation of the event
+ * @remarks Prevents page scrolling while handling the knob
+ */
+function preventScrolling(event: TouchEvent | MouseEvent | KeyboardEvent): void {
+  event.preventDefault();
+  event.stopPropagation(); 
+}
+
 const upListener = () => {
   mouseIsDown.value = false
 }
@@ -202,10 +211,9 @@ function keyDownListener(event: KeyboardEvent) {
 
   if (
     hasFocus.value &&
-    shiftModifier.value &&
     (event.key === 'ArrowUp' || event.key === 'ArrowDown')
   ) {
-    event.preventDefault()
+    preventScrolling(event);  
   }
 }
 
@@ -239,6 +247,7 @@ function wheelListener(event: WheelEvent) {
     newValue = controlAngle.value - 1 * wheelModifier
   }
   changeValue(newValue)
+  preventScrolling(event);
 }
 
 function mouseOverHandler() {
