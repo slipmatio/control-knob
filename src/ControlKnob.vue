@@ -39,6 +39,7 @@ interface Props {
     valueArchClass?: string
     tickClass?: string
     valueTextClass?: string
+    passiveEvents?: boolean
   }
 }
 
@@ -80,6 +81,7 @@ const valueArchClass = props.options?.valueArchClass || 'text-[#53d769]'
 const tickClass = props.options?.tickClass || 'text-black'
 const valueTextClass =
   props.options?.valueTextClass || 'text-gray-50 text-[30px] font-normal font-mono'
+const passiveEvents = props.options?.passiveEvents === undefined ? false : props.options?.passiveEvents
 
 const startValue = vModel.value
 
@@ -169,12 +171,14 @@ function moveListener(event: MouseEvent) {
 
 const debouncedMoveListener = leadingDebounce(moveListener)
 
-/** Prevents propagation of the event
- * @remarks Prevents page scrolling while handling the knob
+/** According to the chosen option, prevents propagation of the event.
+ * @remarks If set, keeps page from scrolling while handling the knob
  */
 function preventScrolling(event: TouchEvent | MouseEvent | KeyboardEvent): void {
-  event.preventDefault();
-  event.stopPropagation(); 
+  if (passiveEvents === false) {    
+    event.preventDefault();
+    event.stopPropagation(); 
+  }
 }
 
 const upListener = () => {
@@ -263,8 +267,8 @@ watch(
   (element, oldElement) => {
     if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
-      // Note: The wheel event is actually non-passive, since it does manipulate scrolling behaviour
-      element.addEventListener('wheel', wheelListener, { passive: false } )
+      // Note: The wheel event is handeled according to the option, possibly manipulating scrolling behaviour
+      element.addEventListener('wheel', wheelListener, { passive: passiveEvents } )
       element.addEventListener('mouseenter', mouseOverHandler)
       element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)

@@ -35,6 +35,12 @@ const vmodel = ref(0)
       <div class="px-8">
         <ControlKnob id="knob2" v-model="vmodel" :options="options" />
       </div>
+
+      <h2 class="mb-6 text-xl font-semibold">Control Knob with passive event handling (not preventing scrolling)</h2>
+
+      <div class="px-8">
+        <ControlKnob id="knob1" v-model="vmodel" :options="{ passiveEvents: true }" />
+      </div>
     </div>
     <div v-if="false">
       <h2 class="mb-6 text-3xl font-semibold">Knob Designer</h2>
