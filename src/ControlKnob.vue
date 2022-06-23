@@ -81,7 +81,8 @@ const valueArchClass = props.options?.valueArchClass || 'text-[#53d769]'
 const tickClass = props.options?.tickClass || 'text-black'
 const valueTextClass =
   props.options?.valueTextClass || 'text-gray-50 text-[30px] font-normal font-mono'
-const passiveEvents = props.options?.passiveEvents === undefined ? false : props.options?.passiveEvents
+const passiveEvents =
+  props.options?.passiveEvents === undefined ? false : props.options?.passiveEvents
 
 const startValue = vModel.value
 
@@ -132,7 +133,7 @@ const downListener = (event: MouseEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
   prevY = event.clientY
-  preventScrolling(event);
+  preventScrolling(event)
 }
 
 function moveListener(event: MouseEvent) {
@@ -175,9 +176,9 @@ const debouncedMoveListener = leadingDebounce(moveListener)
  * @remarks If set, keeps page from scrolling while handling the knob
  */
 function preventScrolling(event: TouchEvent | MouseEvent | KeyboardEvent): void {
-  if (passiveEvents === false) {    
-    event.preventDefault();
-    event.stopPropagation(); 
+  if (passiveEvents === false) {
+    event.preventDefault()
+    event.stopPropagation()
   }
 }
 
@@ -213,11 +214,8 @@ function keyDownListener(event: KeyboardEvent) {
     shiftModifier.value = true
   }
 
-  if (
-    hasFocus.value &&
-    (event.key === 'ArrowUp' || event.key === 'ArrowDown')
-  ) {
-    preventScrolling(event);  
+  if (hasFocus.value && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+    preventScrolling(event)
   }
 }
 
@@ -251,7 +249,7 @@ function wheelListener(event: WheelEvent) {
     newValue = controlAngle.value - 1 * wheelModifier
   }
   changeValue(newValue)
-  preventScrolling(event);
+  preventScrolling(event)
 }
 
 function mouseOverHandler() {
@@ -268,7 +266,7 @@ watch(
     if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
       // Note: The wheel event is handeled according to the option, possibly manipulating scrolling behaviour
-      element.addEventListener('wheel', wheelListener, { passive: passiveEvents } )
+      element.addEventListener('wheel', wheelListener, { passive: passiveEvents })
       element.addEventListener('mouseenter', mouseOverHandler)
       element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
