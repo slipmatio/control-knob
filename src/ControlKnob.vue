@@ -129,17 +129,28 @@ const mouseMoved = ref(false)
 const hasFocus = ref(false)
 const shiftModifier = ref(false)
 
-const downListener = (event: MouseEvent) => {
+const downListener = (event: MouseEvent | TouchEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
-  prevY = event.clientY
-  preventScrolling(event)
+  prevY = getEventY(event);
+  preventScrolling(event);
 }
 
-function moveListener(event: MouseEvent) {
+ /** Gets the y coordinate associated with the event */
+function getEventY(event: TouchEvent | MouseEvent): number {
+  if (window.TouchEvent && event instanceof TouchEvent) {
+    return event.touches[0].pageY;
+  }
+  else if (event instanceof MouseEvent) {
+    return currentY = event.clientY
+  }
+  return 0;
+}
+
+function moveListener(event: TouchEvent | MouseEvent) {
   mouseMoved.value = true
   if (mouseIsDown.value) {
-    currentY = event.clientY
+    currentY = getEventY(event);
     let direction: 'up' | 'down'
     const curYchange = prevY - currentY
 
@@ -210,6 +221,7 @@ function changeValue(change: number) {
 }
 
 function keyDownListener(event: KeyboardEvent) {
+  //Update the shift modifier here already, otherwise the precise mode is not triggered properly
   if (event.key === 'Shift') {
     shiftModifier.value = true
   }
@@ -229,9 +241,6 @@ function keyUpListener(event: KeyboardEvent) {
   if (hasFocus.value && event.key === 'ArrowUp') {
     newValue = controlAngle.value + 1 * keyModifier
     changeValue(newValue)
-    if (shiftModifier.value) {
-      event.stopPropagation()
-    }
   }
 
   if (hasFocus.value && event.key === 'ArrowDown') {
@@ -265,11 +274,14 @@ watch(
   (element, oldElement) => {
     if (element && !oldElement) {
       element.addEventListener('mousedown', downListener)
+      element.addEventListener('touchstart', downListener, { passive: passiveEvents })
       element.addEventListener('wheel', wheelListener, { passive: passiveEvents })
       element.addEventListener('mouseenter', mouseOverHandler)
       element.addEventListener('mouseleave', mouseOutHandler)
       document.addEventListener('mouseup', upListener)
+      document.addEventListener('touchend', upListener)
       document.addEventListener('mousemove', debouncedMoveListener)
+      document.addEventListener('touchmove', debouncedMoveListener)
       document.addEventListener('keydown', keyDownListener)
       document.addEventListener('keyup', keyUpListener)
 
@@ -292,11 +304,14 @@ watch(
 
 onBeforeUnmount(() => {
   knobElement.value.removeEventListener('mousedown', downListener)
+  knobElement.value.removeEventListener('touchstart', downListener)
   knobElement.value.removeEventListener('wheel', wheelListener)
   knobElement.value.removeEventListener('mouseenter', mouseOverHandler)
   knobElement.value.removeEventListener('mouseleave', mouseOutHandler)
   document.removeEventListener('mouseup', upListener)
+  document.removeEventListener('touchend', upListener)
   document.removeEventListener('mousemove', debouncedMoveListener)
+  document.removeEventListener('touchmove', debouncedMoveListener)
   document.removeEventListener('keydown', keyDownListener)
   document.removeEventListener('keyup', keyUpListener)
 })
