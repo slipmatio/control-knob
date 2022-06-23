@@ -51,7 +51,7 @@ All configuration options are optional. The options referencing inner coordinate
 | valueArchClass | 'text-[#53d769]' | CSS class for the value arch. |
 | tickClass | 'text-black' | CSS class for the tick line. |
 | valueTextClass | 'text-gray-50 text-[30px] font-normal font-mono' | CSS class for the value text. |
-
+| passiveEvents | false | When set, propagation of handeled events is not prevented. |
 
 **Note** that if you're using Tailwind CSS with automatic purge, you'll probably want to add the default classes as options so PurgeCSS catches them (or you can just whitelist them):
 
