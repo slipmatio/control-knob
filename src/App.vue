@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import Designer from './Designer.vue'
 import ControlKnob from './ControlKnob.vue'
+import DesignerComponent from './DesignerComponent.vue'
 
 const options = {
   imageSize: 80,
@@ -36,7 +36,9 @@ const vmodel = ref(0)
         <ControlKnob id="knob2" v-model="vmodel" :options="options" />
       </div>
 
-      <h2 class="mb-6 text-xl font-semibold">Control Knob with passive event handling (not preventing scrolling)</h2>
+      <h2 class="mb-6 text-xl font-semibold">
+        Control Knob with passive event handling (not preventing scrolling)
+      </h2>
 
       <div class="px-8">
         <ControlKnob id="knob1" v-model="vmodel" :options="{ passiveEvents: true }" />
@@ -44,7 +46,7 @@ const vmodel = ref(0)
     </div>
     <div v-if="false">
       <h2 class="mb-6 text-3xl font-semibold">Knob Designer</h2>
-      <Designer />
+      <DesignerComponent />
     </div>
   </div>
 </template>

@@ -10,12 +10,19 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "plugins": [{ "name": "@vuedx/typescript-plugin-vue" }],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.spec.ts",
+    "tests/**/*.test.ts",
+    "src/**/*.d.ts",
+    "src/**/*.vue"
+  ],
   "exclude": ["node_modules", "dist", "public", "tests"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
