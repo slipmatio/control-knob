@@ -7,13 +7,13 @@ on:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/main.yml'
   pull_request:
     paths:
       - 'src/**'
       - 'tests/**'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/main.yml'
 
 concurrency:
@@ -25,27 +25,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: bahmutov/npm-install@v1
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+          run_install: true
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
 
       ## Test
-      - name: Start Vite devserver
-        run: yarn start
+      - name: Run component + unit tests
+        run: pnpm test:ci
 
-      - name: Run unit tests
-        run: yarn test:ci
-
-      - name: Run component tests
-        run: yarn test:ci-components
-
-      - name: Run e2e tests
-        run: |
-          yarn test:ci-e2e
-          yarn coverage
-
-      - name: Upload artifacts on fail
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: videos
-          path: tests/e2e/videos/
+      # - name: Run e2e tests
+      #   run: |
+      #     yarn test:ci-e2e
+      #     yarn coverage

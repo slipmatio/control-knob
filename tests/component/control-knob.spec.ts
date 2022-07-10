@@ -1,19 +1,19 @@
-import { mount } from '@cypress/vue'
+import { mount } from '@vue/test-utils'
+import { expect, test } from 'vitest'
 import ControlKnob from '../../src/ControlKnob.vue'
 
-// @ts-expect-error dont need types here
-import CSSUrl from '../../src/assets/index.postcss'
+test('Passes msg prop correctly', async () => {
+  expect(ControlKnob).toBeTruthy()
 
-it('Passes msg prop correctly', () => {
-  // @ts-expect-error this is ok
-  mount(ControlKnob, {
-    stylesheet: [CSSUrl],
-    propsData: {
+  const wrapper = mount(ControlKnob, {
+    props: {
+      modelValue: 0,
       options: {
         tabIndex: 5,
       },
     },
   })
 
-  cy.get('svg').should('contain.attr', 'tabindex', '5')
+  const svg = wrapper.get('svg')
+  expect(svg.attributes()['tabindex']).toBe('5')
 })

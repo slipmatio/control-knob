@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { HALF_VIEWBOX, MAX_ANGLE, MIN_ANGLE, RADIUS } from '@/constants'
 import {
-  degToRad,
-  leadingDebounce,
   changeToControlAngle,
   controlAngleToValue,
+  degToRad,
+  leadingDebounce,
   valueToControlAngle,
 } from '@/utils'
-import { RADIUS, HALF_VIEWBOX, MIN_ANGLE, MAX_ANGLE } from '@/constants'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 const knobElement = ref<HTMLElement>(0 as unknown as HTMLElement)
 const controlAngle = ref(MIN_ANGLE)
@@ -318,10 +318,10 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <svg
+    ref="knobElement"
     :width="imageSize"
     :height="imageSize"
     viewBox="0 0 100 100"
-    ref="knobElement"
     role="slider"
     :aria-label="ariaLabel"
     :aria-valuemin="knobMinValue"
