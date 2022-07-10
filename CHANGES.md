@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (Unreleased)
+## 0.1.0 (2022-07-10)
 
 - Fix: prevent page scrolling on mousewheel (thanks to @suterma for the contribution) (#10)
 - Tooling: migrated package management to pnpm
