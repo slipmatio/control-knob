@@ -31,7 +31,8 @@ export default defineConfig({
   },
 
   test: {
-    include: ['tests/unit/**/*.{test,spec}.ts'],
+    environment: 'happy-dom',
+    include: ['tests/{component,unit}/**/*.{test,spec}.ts'],
   },
 
   build: {

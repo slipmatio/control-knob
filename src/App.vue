@@ -27,7 +27,7 @@ const vmodel = ref(0)
       <h2 class="mb-6 text-xl font-semibold">Default Control Knob</h2>
 
       <div class="px-8">
-        <ControlKnob id="knob1" v-model="vmodel" />
+        <ControlKnob id="knob1" v-model="vmodel" data-test-id="first" />
       </div>
 
       <h2 class="my-6 text-xl font-semibold">Modified Control Knob</h2>

@@ -23,7 +23,7 @@ Fully customizable rotary control knob component for Vue 3 that behaves like nat
 
 ### Configuration
 
-All configuration options are optional. The options referencing inner coordinate positions are based on 100x100 coordinate system that is not affected by the imageSize.
+**All configuration options are optional**. The options referencing inner coordinate positions are based on 100x100 coordinate system that is not affected by the imageSize.
 
 | Option           | Default                                          | Description                                                |
 | ---------------- | ------------------------------------------------ | ---------------------------------------------------------- |

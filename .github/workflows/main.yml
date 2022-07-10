@@ -36,11 +36,8 @@ jobs:
           cache: 'pnpm'
 
       ## Test
-      - name: Run unit tests
+      - name: Run component + unit tests
         run: pnpm test:ci
-
-      # - name: Run component tests
-      #   run: yarn test:ci-components
 
       # - name: Run e2e tests
       #   run: |
