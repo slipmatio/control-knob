@@ -1,11 +1,11 @@
-import { describe, it, beforeEach, afterEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
+import { MAX_ANGLE, MIN_ANGLE } from '../../src/constants'
 import {
-  degToRad,
-  leadingDebounce,
   changeToControlAngle,
   controlAngleToValue,
+  degToRad,
+  leadingDebounce,
 } from '../../src/utils'
-import { MIN_ANGLE, MAX_ANGLE } from '../../src/constants'
 
 const testfn = (a: number) => a + 1
 

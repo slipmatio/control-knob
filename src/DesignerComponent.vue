@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
 // PI radians = 180 degrees
 // 2PI radians = 360 degrees
@@ -62,42 +62,42 @@ const valueArch = computed(
   <div>
     <div>
       <p>Value: {{ controlAngle }}</p>
-      <input type="range" min="120" max="420" v-model="controlAngle" />
+      <input v-model="controlAngle" type="range" min="120" max="420" />
     </div>
 
     <div>
       <p>Tick length: {{ tickLength }}</p>
-      <input type="range" min="1" max="50" v-model="tickLength" />
+      <input v-model="tickLength" type="range" min="1" max="50" />
     </div>
 
     <div>
       <p>Tick offset: {{ tickOffset }}</p>
-      <input type="range" min="-10" max="50" v-model="tickOffset" />
+      <input v-model="tickOffset" type="range" min="-10" max="50" />
     </div>
 
     <div>
       <p>Tick stroke: {{ lineStroke }}</p>
-      <input type="range" min="1" max="6" v-model="lineStroke" />
+      <input v-model="lineStroke" type="range" min="1" max="6" />
     </div>
 
     <div>
       <p>Rim stroke: {{ rimStroke }}</p>
-      <input type="range" min="1" max="20" v-model="rimStroke" />
+      <input v-model="rimStroke" type="range" min="1" max="20" />
     </div>
 
     <div>
       <p>valueArc stroke: {{ valueArchStroke }}</p>
-      <input type="range" min="1" max="20" v-model="valueArchStroke" />
+      <input v-model="valueArchStroke" type="range" min="1" max="20" />
     </div>
 
     <div>
       <p>Background radius: {{ bgRadius }}</p>
-      <input type="range" min="30" max="50" v-model="bgRadius" />
+      <input v-model="bgRadius" type="range" min="30" max="50" />
     </div>
 
     <div>
       <p>Image width: {{ imageSize }}</p>
-      <input type="range" min="40" max="500" v-model="imageSize" />
+      <input v-model="imageSize" type="range" min="40" max="500" />
     </div>
   </div>
 
