@@ -36,11 +36,8 @@ jobs:
           cache: 'pnpm'
 
       ## Test
-      - name: Start Vite devserver
-        run: yarn start
-
       - name: Run unit tests
-        run: yarn test:ci
+        run: pnpm test:ci
 
       # - name: Run component tests
       #   run: yarn test:ci-components

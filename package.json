@@ -18,7 +18,9 @@
     "build": "vite build",
     "preview": "vite build --config ./vite.test.config.ts && vite preview --port 3001 --config ./vite.test.config.ts",
     "start": "yarn dev & wait-on tcp:3000 -v",
-    "test": "vitest"
+    "test": "vitest",
+    "test:ci": "vitest run --coverage",
+    "report": "nyc report --reporter=text-summary"
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "0.4.0",
