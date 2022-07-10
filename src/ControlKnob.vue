@@ -132,25 +132,24 @@ const shiftModifier = ref(false)
 const downListener = (event: MouseEvent | TouchEvent) => {
   mouseIsDown.value = true
   mouseMoved.value = false
-  prevY = getEventY(event);
-  preventScrolling(event);
+  prevY = getEventY(event)
+  preventScrolling(event)
 }
 
- /** Gets the y coordinate associated with the event */
+/** Gets the y coordinate associated with the event */
 function getEventY(event: TouchEvent | MouseEvent): number {
   if (window.TouchEvent && event instanceof TouchEvent) {
-    return event.touches[0].pageY;
+    return event.touches[0].pageY
+  } else if (event instanceof MouseEvent) {
+    return (currentY = event.clientY)
   }
-  else if (event instanceof MouseEvent) {
-    return currentY = event.clientY
-  }
-  return 0;
+  return 0
 }
 
 function moveListener(event: TouchEvent | MouseEvent) {
   mouseMoved.value = true
   if (mouseIsDown.value) {
-    currentY = getEventY(event);
+    currentY = getEventY(event)
     let direction: 'up' | 'down'
     const curYchange = prevY - currentY
 
@@ -221,7 +220,7 @@ function changeValue(change: number) {
 }
 
 function keyDownListener(event: KeyboardEvent) {
-  //Update the shift modifier here already, otherwise the precise mode is not triggered properly
+  // Update the shift modifier here already, otherwise the precise mode is not triggered properly
   if (event.key === 'Shift') {
     shiftModifier.value = true
   }
