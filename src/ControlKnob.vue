@@ -141,7 +141,8 @@ function getEventY(event: TouchEvent | MouseEvent): number {
   if (window.TouchEvent && event instanceof TouchEvent) {
     return event.touches[0].pageY
   } else if (event instanceof MouseEvent) {
-    return (currentY = event.clientY)
+    currentY = event.clientY
+    return currentY
   }
   return 0
 }
