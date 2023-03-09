@@ -9,7 +9,7 @@ Fully customizable rotary control knob component for Vue 3 that behaves like nat
 
 - Supports **keyboard, mouse & wheel control**
 - Changes input only with **vertical mouse movement**
-- **Precice mode** using shift + movement
+- **Precise mode** using shift + movement
 - **Reset to default** with Option-click (alt-click)
 - **Zero dependencies** (apart from Vue 3)
 - **Fully configurable** and **Tailwind CSS -friendly** styles
