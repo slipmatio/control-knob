@@ -1,11 +1,11 @@
 {
+  "extends": "@tsconfig/node20/tsconfig.json",
+  "include": ["vite.test.config.ts", "vite.config.ts", "playwright.config.ts"],
   "compilerOptions": {
     "composite": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "types": ["vite/client", "node"]
-  },
-  "include": ["package.json", "vite.config.ts", "vite.test.config.ts"]
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"]
+  }
 }

@@ -16,7 +16,7 @@
         "npm"
       ],
       "stabilityDays": 2,
-      "prCreation": "not-pending"
+      "automerge": true
     }
   ],
   "timezone": "Europe/Helsinki",

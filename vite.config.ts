@@ -1,7 +1,6 @@
-/// <reference types="vitest" />
 import vue from '@vitejs/plugin-vue'
-import * as path from 'path'
-import { defineConfig } from 'vite'
+import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vitest/config'
 import dts from 'vite-plugin-dts'
 import { version as pkgVersion } from './package.json'
 
@@ -12,11 +11,7 @@ if (process.env.NODE_ENV === 'production') {
 
 export default defineConfig({
   plugins: [
-    vue({
-      script: {
-        refSugar: true,
-      },
-    }),
+    vue(),
     dts({
       staticImport: true,
       // copyDtsFiles: false,
@@ -26,7 +21,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 
