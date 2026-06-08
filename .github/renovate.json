@@ -1,14 +1,30 @@
 {
-  "extends": ["config:base", "group:all", "schedule:weekly"],
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigestsToSemver"],
+  "enabledManagers": ["npm", "github-actions"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
   "packageRules": [
     {
-      "updateTypes": ["patch"],
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch"],
       "enabled": false
     },
     {
       "matchManagers": ["npm"],
-      "stabilityDays": 2,
-      "prCreation": "not-pending"
+      "minimumReleaseAge": "3 days",
+      "automerge": true,
+      "automergeSchedule": ["after 4am and before 8am"]
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "tooling-dependencies",
+      "groupSlug": "tooling",
+      "automerge": true,
+      "minimumReleaseAge": "3 days",
+      "automergeSchedule": ["after 4am and before 8am"]
     }
   ],
   "timezone": "Europe/Helsinki",
