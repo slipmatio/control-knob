@@ -4,6 +4,8 @@ export interface ControlKnobOptions {
   maxValue?: number
   /** Value restored on alt-click / reset. Defaults to `minValue`. */
   defaultValue?: number
+  /** Snaps the value to multiples of this increment (e.g. `0.01`). `0` (default) keeps it continuous. */
+  step?: number
   /** Formats the displayed value and `aria-valuetext`. Defaults to rounding. */
   formatValue?: (value: number) => string
   showTick?: boolean
@@ -21,6 +23,8 @@ export interface ControlKnobOptions {
   ariaLabel?: string
   valueTextX?: number
   valueTextY?: number
+  /** Font size of the value text, in viewBox units (the viewBox is 100×100). */
+  fontSize?: number
   svgClass?: string
   bgClass?: string
   rimClass?: string

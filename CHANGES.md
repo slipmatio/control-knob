@@ -1,7 +1,10 @@
 # Changelog
 
-## 0.2.0 (2026-06-08)
+## v2026.6.0
 
+Warning: contains BREAKING CHANGES.
+
+- Refactor: major modernification refactors and bug fixes
 - Chore: bump deps
 
 ## 0.1.0 (2022-07-10)

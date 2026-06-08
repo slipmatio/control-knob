@@ -60,6 +60,21 @@ export function controlAngleToValue(minValue: number, maxValue: number, controlA
   return minValue + valueRange * controlPercentage
 }
 
+/**
+ * Snaps `value` to the nearest multiple of `step` measured from `minValue`, then
+ * clamps to the range. A falsy `step` leaves the value untouched (continuous).
+ * Rounds to the step's decimal places to avoid floating-point drift (e.g. 0.01).
+ */
+export function quantize(minValue: number, maxValue: number, step: number, value: number) {
+  if (!step) {
+    return value
+  }
+  const snapped = minValue + Math.round((value - minValue) / step) * step
+  const clamped = Math.min(maxValue, Math.max(minValue, snapped))
+  const decimals = (String(step).split('.')[1] ?? '').length
+  return Number(clamped.toFixed(decimals))
+}
+
 export function valueToControlAngle(minValue: number, maxValue: number, value: number) {
   let valuePercentage: number
   const controlRange = MAX_ANGLE - MIN_ANGLE

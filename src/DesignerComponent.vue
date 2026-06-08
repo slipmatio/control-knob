@@ -122,8 +122,9 @@ const valueArch = computed(
       <text
         v-if="controlAngle > 120"
         :x="50"
-        :y="62"
+        :y="50"
         text-anchor="middle"
+        dominant-baseline="central"
         fill="currentColor"
         class="text-gray-50 text-[30px] font-normal font-mono"
       >

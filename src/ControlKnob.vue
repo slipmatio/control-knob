@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { HALF_VIEWBOX, MAX_ANGLE, MIN_ANGLE, RADIUS } from '@/constants'
 import type { ControlKnobOptions } from '@/types'
-import { changeToControlAngle, controlAngleToValue, degToRad, rafThrottle, valueToControlAngle } from '@/utils'
+import {
+  changeToControlAngle,
+  controlAngleToValue,
+  degToRad,
+  quantize,
+  rafThrottle,
+  valueToControlAngle,
+} from '@/utils'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 const props = defineProps<{ options?: ControlKnobOptions }>()
@@ -12,6 +19,7 @@ const defaultOptions: Required<ControlKnobOptions> = {
   minValue: 0,
   maxValue: 100,
   defaultValue: 0,
+  step: 0,
   formatValue: (value) => String(Math.round(value)),
   showTick: true,
   showValue: true,
@@ -27,13 +35,14 @@ const defaultOptions: Required<ControlKnobOptions> = {
   tabIndex: 0,
   ariaLabel: 'Knob',
   valueTextX: 50,
-  valueTextY: 62,
+  valueTextY: 50,
+  fontSize: 30,
   svgClass: 'select-none',
   bgClass: 'text-[#868686]',
   rimClass: 'text-[#393939]',
   valueArchClass: 'text-[#53d769]',
   tickClass: 'text-black',
-  valueTextClass: 'text-gray-50 text-[30px] font-normal font-mono',
+  valueTextClass: 'text-gray-50 font-normal font-mono',
   passiveEvents: false,
 }
 
@@ -84,8 +93,12 @@ const showValueText = computed(() => {
 })
 
 function changeValue(angle: number) {
-  controlAngle.value = Math.min(MAX_ANGLE, Math.max(MIN_ANGLE, angle))
-  modelValue.value = controlAngleToValue(knobOptions.value.minValue, knobOptions.value.maxValue, controlAngle.value)
+  const { minValue, maxValue, step } = knobOptions.value
+  const clampedAngle = Math.min(MAX_ANGLE, Math.max(MIN_ANGLE, angle))
+  const value = quantize(minValue, maxValue, step, controlAngleToValue(minValue, maxValue, clampedAngle))
+  modelValue.value = value
+  // Re-derive the angle from the (possibly snapped) value so the tick and arch land on the step.
+  controlAngle.value = step ? getControlAngle(value) : clampedAngle
 }
 
 function resetValue() {
@@ -239,7 +252,9 @@ onBeforeUnmount(() => applyDrag.cancel())
       v-if="showValueText"
       :x="knobOptions.valueTextX"
       :y="knobOptions.valueTextY"
+      :font-size="knobOptions.fontSize"
       text-anchor="middle"
+      dominant-baseline="central"
       fill="currentColor"
       :class="knobOptions.valueTextClass"
     >
