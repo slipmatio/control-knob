@@ -4,12 +4,11 @@ export function degToRad(degrees: number) {
   return (degrees * Math.PI) / 180
 }
 
-export function leadingDebounce<A = unknown, R = void>(func: (args: A) => R, timeout = 13) {
-  let timer: NodeJS.Timeout | undefined
-  return (...args: A[]) => {
+export function leadingDebounce<Args extends unknown[], Return = void>(func: (...args: Args) => Return, timeout = 13) {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  return (...args: Args) => {
     if (!timer) {
-      // @ts-expect-error FIXME: couldn't figure this one out!
-      func.apply(this, args)
+      func(...args)
     } else {
       clearTimeout(timer)
     }

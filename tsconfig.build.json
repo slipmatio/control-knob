@@ -16,14 +16,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "eslint.config.ts",
-    "vite.config.ts",
-    "playwright.config.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "tests/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0 (2026-06-08)
+
+- Chore: bump deps
+
 ## 0.1.0 (2022-07-10)
 
 - Fix: prevent page scrolling on mousewheel (thanks to @suterma for the contribution) (#10)

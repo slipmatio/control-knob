@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { HALF_VIEWBOX, MAX_ANGLE, MIN_ANGLE, RADIUS } from '@/constants'
-import {
-  changeToControlAngle,
-  controlAngleToValue,
-  degToRad,
-  leadingDebounce,
-  valueToControlAngle,
-} from '@/utils'
+import { changeToControlAngle, controlAngleToValue, degToRad, leadingDebounce, valueToControlAngle } from '@/utils'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 const knobElement = ref<HTMLElement>(0 as unknown as HTMLElement)
@@ -60,8 +54,7 @@ const knobMinValue = props.options?.minValue || 0
 const knobMaxValue = props.options?.maxValue || 100
 const showTick = props.options?.showTick === undefined ? true : props.options?.showTick
 const showValue = props.options?.showValue === undefined ? true : props.options?.showTick
-const hideDefaultValue =
-  props.options?.hideDefaultValue === undefined ? true : props.options?.hideDefaultValue
+const hideDefaultValue = props.options?.hideDefaultValue === undefined ? true : props.options?.hideDefaultValue
 const tickLength = props.options?.tickLength || 18
 const tickOffset = props.options?.tickOffset || 10
 const tickStroke = props.options?.tickStroke || 3
@@ -79,10 +72,8 @@ const bgClass = props.options?.bgClass || 'text-[#868686]'
 const rimClass = props.options?.rimClass || 'text-[#393939]'
 const valueArchClass = props.options?.valueArchClass || 'text-[#53d769]'
 const tickClass = props.options?.tickClass || 'text-black'
-const valueTextClass =
-  props.options?.valueTextClass || 'text-gray-50 text-[30px] font-normal font-mono'
-const passiveEvents =
-  props.options?.passiveEvents === undefined ? false : props.options?.passiveEvents
+const valueTextClass = props.options?.valueTextClass || 'text-gray-50 text-[30px] font-normal font-mono'
+const passiveEvents = props.options?.passiveEvents === undefined ? false : props.options?.passiveEvents
 
 const startValue = vModel.value
 
@@ -118,7 +109,7 @@ const valueEndY = computed(() => 50 + Math.sin(degToRad(controlAngle.value)) * R
 const rim = `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 1 1 ${rimEndX} ${rimEndY}`
 const valueArch = computed(
   () =>
-    `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`
+    `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`,
 )
 
 let prevY = 0
@@ -288,7 +279,7 @@ watch(
       const controlValue = valueToControlAngle(knobMinValue, knobMaxValue, props.modelValue)
       controlAngle.value = controlValue
     }
-  }
+  },
 )
 
 watch(
@@ -299,7 +290,7 @@ watch(
       const controlValue = valueToControlAngle(knobMinValue, knobMaxValue, value)
       controlAngle.value = controlValue
     }
-  }
+  },
 )
 
 onBeforeUnmount(() => {
@@ -343,13 +334,7 @@ onBeforeUnmount(() => {
       :stroke-width="1"
     />
 
-    <path
-      :d="rim"
-      :stroke-width="rimStroke"
-      stroke="currentColor"
-      fill="none"
-      :class="rimClass"
-    ></path>
+    <path :d="rim" :stroke-width="rimStroke" stroke="currentColor" fill="none" :class="rimClass"></path>
 
     <path
       v-if="controlAngle > 120"

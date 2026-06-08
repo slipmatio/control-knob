@@ -1,13 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
 import { MAX_ANGLE, MIN_ANGLE } from '../../src/constants'
-import {
-  changeToControlAngle,
-  controlAngleToValue,
-  degToRad,
-  leadingDebounce,
-} from '../../src/utils'
+import { changeToControlAngle, controlAngleToValue, degToRad, leadingDebounce } from '../../src/utils'
 
-const testfn = (a: number) => a + 1
+const testFn = (val: number) => val + 1
 
 test('degToRad', () => {
   expect(degToRad(0)).toEqual(0)
@@ -28,7 +23,7 @@ describe('leadingDebounce', () => {
   })
 
   it('debounces', () => {
-    const mock = vi.fn().mockImplementation(testfn)
+    const mock = vi.fn().mockImplementation(testFn)
     const debouncedMock = leadingDebounce(func)
 
     mock(1)
@@ -42,10 +37,8 @@ describe('leadingDebounce', () => {
       debouncedMock()
     }
 
-    // @ts-expect-error missing typings
-    expect(mock.calls.length).toBe(6)
-    // @ts-expect-error missing typings
-    expect(func.calls.length).toBeLessThan(6)
+    expect(mock.mock.calls.length).toBe(6)
+    expect(func.mock.calls.length).toBeLessThan(6)
   })
 })
 
