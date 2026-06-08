@@ -55,7 +55,7 @@ const valueEndY = computed(() => 50 + Math.sin(degToRad(controlAngle.value)) * R
 const rim = `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 1 1 ${rimEndX} ${rimEndY}`
 const valueArch = computed(
   () =>
-    `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`
+    `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`,
 )
 </script>
 <template>
@@ -103,23 +103,9 @@ const valueArch = computed(
 
   <div class="flex flex-row justify-center p-4 space-x-4">
     <svg :width="imageSize" :height="imageSize" viewBox="0 0 100 100" class="">
-      <circle
-        :cx="HALF_VIEWBOX"
-        :cy="HALF_VIEWBOX"
-        :r="bgRadius"
-        stroke="#868686"
-        fill="#868686"
-        :stroke-width="1"
-      />
+      <circle :cx="HALF_VIEWBOX" :cy="HALF_VIEWBOX" :r="bgRadius" stroke="#868686" fill="#868686" :stroke-width="1" />
 
-      <path
-        :d="rim"
-        :stroke-width="rimStroke"
-        stroke="currentColor"
-        class=""
-        style="color: #393939"
-        fill="none"
-      ></path>
+      <path :d="rim" :stroke-width="rimStroke" stroke="currentColor" class="" style="color: #393939" fill="none"></path>
 
       <path
         v-if="controlAngle > 120"
@@ -131,20 +117,14 @@ const valueArch = computed(
         fill="none"
       ></path>
 
-      <line
-        :x1="tickStartX"
-        :y1="tickStartY"
-        :x2="tickEndX"
-        :y2="tickEndY"
-        stroke="black"
-        :stroke-width="lineStroke"
-      />
+      <line :x1="tickStartX" :y1="tickStartY" :x2="tickEndX" :y2="tickEndY" stroke="black" :stroke-width="lineStroke" />
 
       <text
         v-if="controlAngle > 120"
         :x="50"
-        :y="62"
+        :y="50"
         text-anchor="middle"
+        dominant-baseline="central"
         fill="currentColor"
         class="text-gray-50 text-[30px] font-normal font-mono"
       >
@@ -157,8 +137,10 @@ const valueArch = computed(
     <h3 class="mt-4 mb-4 text-xl font-semibold">Debug data</h3>
     <table class="font-mono text-sm">
       <thead class="uppercase">
-        <th class="w-24 text-left">Variable</th>
-        <th class="text-left">Value</th>
+        <tr>
+          <th class="w-24 text-left">Variable</th>
+          <th class="text-left">Value</th>
+        </tr>
       </thead>
       <tbody>
         <tr>

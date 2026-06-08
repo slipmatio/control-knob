@@ -1,13 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
-import { MAX_ANGLE, MIN_ANGLE } from '../../src/constants'
-import {
-  changeToControlAngle,
-  controlAngleToValue,
-  degToRad,
-  leadingDebounce,
-} from '../../src/utils'
-
-const testfn = (a: number) => a + 1
+import { MAX_ANGLE, MIN_ANGLE } from '@/constants'
+import { changeToControlAngle, controlAngleToValue, degToRad, quantize, rafThrottle } from '@/utils'
 
 test('degToRad', () => {
   expect(degToRad(0)).toEqual(0)
@@ -17,35 +10,37 @@ test('degToRad', () => {
   expect(degToRad(360)).toEqual(Math.PI * 2)
 })
 
-describe('leadingDebounce', () => {
-  let func = vi.fn()
-
+describe('rafThrottle', () => {
   beforeEach(() => {
-    func = vi.fn()
+    vi.useFakeTimers()
   })
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.useRealTimers()
   })
 
-  it('debounces', () => {
-    const mock = vi.fn().mockImplementation(testfn)
-    const debouncedMock = leadingDebounce(func)
+  it('runs once per frame with the latest arguments', () => {
+    const func = vi.fn()
+    const throttled = rafThrottle(func)
 
-    mock(1)
-    debouncedMock(1)
+    throttled(1)
+    throttled(2)
+    throttled(3)
+    expect(func).not.toHaveBeenCalled()
 
-    expect(mock).toHaveBeenCalledTimes(1)
+    vi.advanceTimersToNextFrame()
     expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenCalledWith(3)
+  })
 
-    for (let i = 0; i < 5; i++) {
-      mock(1)
-      debouncedMock()
-    }
+  it('cancel prevents a pending call', () => {
+    const func = vi.fn()
+    const throttled = rafThrottle(func)
 
-    // @ts-expect-error missing typings
-    expect(mock.calls.length).toBe(6)
-    // @ts-expect-error missing typings
-    expect(func.calls.length).toBeLessThan(6)
+    throttled(1)
+    throttled.cancel()
+
+    vi.advanceTimersToNextFrame()
+    expect(func).not.toHaveBeenCalled()
   })
 })
 
@@ -77,6 +72,21 @@ test('changeToControlAngle', () => {
   expect(changeToControlAngle(200, 30, true)).toEqual(6)
   expect(changeToControlAngle(200, -30, false)).toEqual(-60)
   expect(changeToControlAngle(200, -30, true)).toEqual(-6)
+})
+
+test('quantize', () => {
+  // step 0 leaves the value untouched
+  expect(quantize(0, 100, 0, 42.37)).toEqual(42.37)
+  // snaps to 0.01 increments without floating-point drift
+  expect(quantize(0, 1, 0.01, 0.1234)).toEqual(0.12)
+  expect(quantize(0, 1, 0.01, 0.125)).toEqual(0.13)
+  expect(quantize(0, 1, 0.01, 0.3)).toEqual(0.3)
+  // snaps relative to a non-zero minimum
+  expect(quantize(-1, 1, 0.5, 0.2)).toEqual(0)
+  expect(quantize(-1, 1, 0.5, -0.4)).toEqual(-0.5)
+  // clamps to the range
+  expect(quantize(0, 1, 0.01, 1.5)).toEqual(1)
+  expect(quantize(0, 1, 0.01, -0.5)).toEqual(0)
 })
 
 test('controlAngleToValue', () => {

@@ -1,6 +1,6 @@
+import App from '@/App.vue'
+import '@/assets/index.css'
 import { createApp } from 'vue'
-import App from './App.vue'
-import './assets/index.postcss'
 
 const app = createApp(App)
 

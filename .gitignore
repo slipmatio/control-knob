@@ -32,3 +32,5 @@ pnpm-debug.log*
 *.local
 LOCAL_NOTES.md
 src/Old.vue
+AGENTS.md
+CLAUDE.md

@@ -1,84 +1,71 @@
 {
   "name": "@slipmatio/control-knob",
-  "version": "0.1.0",
-  "main": "dist/index.es.js",
-  "module": "dist/index.es.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
-    }
-  },
-  "typings": "./dist/src/lib.d.ts",
-  "repository": "https://github.com/slipmatio/control-knob",
-  "author": "Ville Säävuori <ville@unessa.net>",
-  "license": "MIT",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite build --config ./vite.test.config.ts && vite preview --port 3001 --config ./vite.test.config.ts",
-    "start": "yarn dev & wait-on tcp:3000 -v",
-    "test": "vitest",
-    "test:ci": "vitest run --coverage",
-    "report": "nyc report --reporter=text-summary"
-  },
-  "devDependencies": {
-    "@playwright/experimental-ct-vue": "1.23.2",
-    "@playwright/test": "1.23.2",
-    "@tailwindcss/aspect-ratio": "0.4.0",
-    "@tailwindcss/forms": "0.5.2",
-    "@tailwindcss/line-clamp": "0.4.0",
-    "@tailwindcss/typography": "0.5.3",
-    "@typescript-eslint/eslint-plugin": "5.30.5",
-    "@typescript-eslint/parser": "5.30.5",
-    "@vitejs/plugin-vue": "2.3.3",
-    "@vue/test-utils": "2.0.2",
-    "autoprefixer": "10.4.7",
-    "c8": "7.11.3",
-    "eslint": "8.19.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "6.0.0",
-    "eslint-plugin-security": "1.5.0",
-    "eslint-plugin-vue": "9.2.0",
-    "happy-dom": "^6.0.2",
-    "nyc": "15.1.0",
-    "postcss": "8.4.14",
-    "postcss-import": "14.1.0",
-    "postcss-nesting": "10.1.10",
-    "start-server-and-test": "1.14.0",
-    "tailwindcss": "3.1.5",
-    "typescript": "4.7.4",
-    "vite": "2.9.14",
-    "vite-plugin-dts": "1.2.1",
-    "vite-plugin-istanbul": "2.8.0",
-    "vitest": "0.18.0",
-    "vue": "3.2.37",
-    "wait-on": "6.0.1"
-  },
-  "files": [
-    "dist/index.es.js",
-    "dist/index.es.js.map",
-    "dist/index.umd.js",
-    "dist/index.umd.js.map",
-    "dist/src/constants.d.ts",
-    "dist/src/ControlKnob.vue.d.ts",
-    "dist/src/lib.d.ts",
-    "dist/src/utils.d.ts",
-    "README.md",
-    "LICENSE.md"
-  ],
+  "version": "2026.6.0",
   "keywords": [
-    "vue",
-    "vue-component",
+    "audio",
     "knob",
     "slider",
-    "audio",
-    "slipmatio"
+    "slipmatio",
+    "vue",
+    "vue-component"
   ],
+  "homepage": "https://github.com/slipmatio/control-knob",
   "bugs": {
     "url": "https://github.com/slipmatio/control-knob/issues"
   },
-  "homepage": "https://github.com/slipmatio/control-knob"
+  "license": "MIT",
+  "author": "Ville Säävuori <ville@unessa.net>",
+  "repository": "https://github.com/slipmatio/control-knob",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/lib.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/lib.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 3001",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "lint": "oxlint . --fix -D correctness --ignore-path .gitignore && eslint \"src/**/*.{ts,vue}\" --concurrency=auto",
+    "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
+    "lint:eslint": "eslint \"src/**/*.{ts,vue}\" --concurrency=auto",
+    "fmt": "oxfmt .",
+    "ts": "vue-tsc --noEmit",
+    "qa": "pnpm fmt && pnpm lint && pnpm ts && pnpm test:run"
+  },
+  "devDependencies": {
+    "@playwright/experimental-ct-vue": "^1.60.0",
+    "@playwright/test": "^1.60.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/node": "^25.9.2",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vitest/eslint-plugin": "^1.6.19",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.8.0",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.4.1",
+    "eslint-plugin-oxlint": "^1.68.0",
+    "eslint-plugin-vue": "^10.9.2",
+    "happy-dom": "^20.10.2",
+    "oxfmt": "^0.53.0",
+    "oxlint": "^1.68.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^8.0.16",
+    "vite-plugin-dts": "^5.0.2",
+    "vitest": "^4.1.8",
+    "vue": "^3.5.35",
+    "vue-tsc": "^3.3.3"
+  }
 }

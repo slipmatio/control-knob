@@ -1,385 +1,264 @@
 <script setup lang="ts">
 import { HALF_VIEWBOX, MAX_ANGLE, MIN_ANGLE, RADIUS } from '@/constants'
+import type { ControlKnobOptions } from '@/types'
 import {
   changeToControlAngle,
   controlAngleToValue,
   degToRad,
-  leadingDebounce,
+  quantize,
+  rafThrottle,
   valueToControlAngle,
 } from '@/utils'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
-const knobElement = ref<HTMLElement>(0 as unknown as HTMLElement)
-const controlAngle = ref(MIN_ANGLE)
+const props = defineProps<{ options?: ControlKnobOptions }>()
+const modelValue = defineModel<number>({ default: 0 })
 
-interface Props {
-  modelValue: number
-  options?: {
-    imageSize?: number
-    minValue?: number
-    maxValue?: number
-    showTick?: boolean
-    showValue?: boolean
-    hideDefaultValue?: boolean
-    tickLength?: number
-    tickOffset?: number
-    tickStroke?: number
-    rimStroke?: number
-    valueArchStroke?: number
-    bgRadius?: number
-    wheelFactor?: number
-    keyFactor?: number
-    tabIndex?: number
-    ariaLabel?: string
-    valueTextX?: number
-    valueTextY?: number
-    svgClass?: string
-    bgClass?: string
-    rimClass?: string
-    valueArchClass?: string
-    tickClass?: string
-    valueTextClass?: string
-    passiveEvents?: boolean
-  }
+const defaultOptions: Required<ControlKnobOptions> = {
+  imageSize: 40,
+  minValue: 0,
+  maxValue: 100,
+  defaultValue: 0,
+  step: 0,
+  formatValue: (value) => String(Math.round(value)),
+  showTick: true,
+  showValue: true,
+  hideDefaultValue: true,
+  tickLength: 18,
+  tickOffset: 10,
+  tickStroke: 3,
+  rimStroke: 11,
+  valueArchStroke: 11,
+  bgRadius: 34,
+  wheelFactor: 10,
+  keyFactor: 10,
+  tabIndex: 0,
+  ariaLabel: 'Knob',
+  valueTextX: 50,
+  valueTextY: 50,
+  fontSize: 30,
+  svgClass: 'select-none',
+  bgClass: 'text-[#868686]',
+  rimClass: 'text-[#393939]',
+  valueArchClass: 'text-[#53d769]',
+  tickClass: 'text-black',
+  valueTextClass: 'text-gray-50 font-normal font-mono',
+  passiveEvents: false,
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits(['update:modelValue'])
-
-const vModel = computed<number>({
-  get() {
-    return props.modelValue
-  },
-  set(value) {
-    emit('update:modelValue', value)
-  },
+const knobOptions = computed<Required<ControlKnobOptions>>(() => {
+  const overrides = Object.entries(props.options ?? {}).filter(([, value]) => value !== undefined)
+  return { ...defaultOptions, ...Object.fromEntries(overrides) }
 })
 
-const imageSize = props.options?.imageSize || 40
-const knobMinValue = props.options?.minValue || 0
-const knobMaxValue = props.options?.maxValue || 100
-const showTick = props.options?.showTick === undefined ? true : props.options?.showTick
-const showValue = props.options?.showValue === undefined ? true : props.options?.showTick
-const hideDefaultValue =
-  props.options?.hideDefaultValue === undefined ? true : props.options?.hideDefaultValue
-const tickLength = props.options?.tickLength || 18
-const tickOffset = props.options?.tickOffset || 10
-const tickStroke = props.options?.tickStroke || 3
-const rimStroke = props.options?.rimStroke || 11
-const valueArchStroke = props.options?.valueArchStroke || 11
-const bgRadius = props.options?.bgRadius || 34
-const wheelModifierFactor = props.options?.wheelFactor || 10
-const keyModifierFactor = props.options?.keyFactor || 10
-const tabIndex = props.options?.tabIndex || 0
-const ariaLabel = props.options?.ariaLabel || 'Knob'
-const valueTextX = props.options?.valueTextX || 50
-const valueTextY = props.options?.valueTextY || 62
-const svgClass = props.options?.svgClass || 'select-none'
-const bgClass = props.options?.bgClass || 'text-[#868686]'
-const rimClass = props.options?.rimClass || 'text-[#393939]'
-const valueArchClass = props.options?.valueArchClass || 'text-[#53d769]'
-const tickClass = props.options?.tickClass || 'text-black'
-const valueTextClass =
-  props.options?.valueTextClass || 'text-gray-50 text-[30px] font-normal font-mono'
-const passiveEvents =
-  props.options?.passiveEvents === undefined ? false : props.options?.passiveEvents
+function getControlAngle(value: number) {
+  return valueToControlAngle(knobOptions.value.minValue, knobOptions.value.maxValue, value)
+}
 
-const startValue = vModel.value
+const controlAngle = ref(getControlAngle(modelValue.value))
 
-const tickStartX = computed(() => {
-  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickLength)
+const angleRad = computed(() => degToRad(controlAngle.value))
+const cosAngle = computed(() => Math.cos(angleRad.value))
+const sinAngle = computed(() => Math.sin(angleRad.value))
+
+const tick = computed(() => {
+  const { tickLength, tickOffset } = knobOptions.value
+  return {
+    x1: HALF_VIEWBOX + cosAngle.value * (RADIUS - tickLength),
+    y1: HALF_VIEWBOX + sinAngle.value * (RADIUS - tickLength),
+    x2: HALF_VIEWBOX + cosAngle.value * (RADIUS - tickOffset),
+    y2: HALF_VIEWBOX + sinAngle.value * (RADIUS - tickOffset),
+  }
 })
 
-const tickStartY = computed(() => {
-  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickLength)
-})
-
-const tickEndX = computed(() => {
-  return HALF_VIEWBOX + Math.cos(degToRad(controlAngle.value)) * (RADIUS - tickOffset)
-})
-
-const tickEndY = computed(() => {
-  return HALF_VIEWBOX + Math.sin(degToRad(controlAngle.value)) * (RADIUS - tickOffset)
-})
-
-const rimStartX = HALF_VIEWBOX + -0.5 * RADIUS
-const rimStartY = HALF_VIEWBOX + Math.sin(degToRad(120)) * RADIUS
+const startRad = degToRad(MIN_ANGLE)
+const rimStartX = HALF_VIEWBOX - 0.5 * RADIUS
+const rimStartY = HALF_VIEWBOX + Math.sin(startRad) * RADIUS
 const rimEndX = HALF_VIEWBOX + 0.5 * RADIUS
-const rimEndY = HALF_VIEWBOX + Math.sin(degToRad(420)) * RADIUS
-
-const startRad = degToRad(120)
-const currentValueRad = computed(() => degToRad(controlAngle.value))
-const largeArch = computed(() => (Math.abs(startRad - currentValueRad.value) < Math.PI ? 0 : 1))
-const sweep = ref(1)
-
-const valueEndX = computed(() => 50 + Math.cos(degToRad(controlAngle.value)) * RADIUS)
-const valueEndY = computed(() => 50 + Math.sin(degToRad(controlAngle.value)) * RADIUS)
-
+const rimEndY = HALF_VIEWBOX + Math.sin(degToRad(MAX_ANGLE)) * RADIUS
 const rim = `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 1 1 ${rimEndX} ${rimEndY}`
-const valueArch = computed(
-  () =>
-    `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArch.value} ${sweep.value} ${valueEndX.value} ${valueEndY.value}`
-)
 
-let prevY = 0
-let currentY = 0
-const mouseIsDown = ref(false)
-const mouseIsOver = ref(false)
-const mouseMoved = ref(false)
-const hasFocus = ref(false)
-const shiftModifier = ref(false)
+const valueArch = computed(() => {
+  const endX = HALF_VIEWBOX + cosAngle.value * RADIUS
+  const endY = HALF_VIEWBOX + sinAngle.value * RADIUS
+  // SVG large-arc flag: 1 once the swept angle exceeds a half turn.
+  const largeArc = Math.abs(startRad - angleRad.value) < Math.PI ? 0 : 1
+  return `M ${rimStartX} ${rimStartY} A ${RADIUS} ${RADIUS} 0 ${largeArc} 1 ${endX} ${endY}`
+})
 
-const downListener = (event: MouseEvent | TouchEvent) => {
-  mouseIsDown.value = true
-  mouseMoved.value = false
-  prevY = getEventY(event)
-  preventScrolling(event)
+const valueText = computed(() => knobOptions.value.formatValue(modelValue.value))
+const showValueText = computed(() => {
+  const { showValue, hideDefaultValue, defaultValue } = knobOptions.value
+  return showValue && (!hideDefaultValue || modelValue.value !== defaultValue)
+})
+
+function changeValue(angle: number) {
+  const { minValue, maxValue, step } = knobOptions.value
+  const clampedAngle = Math.min(MAX_ANGLE, Math.max(MIN_ANGLE, angle))
+  const value = quantize(minValue, maxValue, step, controlAngleToValue(minValue, maxValue, clampedAngle))
+  modelValue.value = value
+  // Re-derive the angle from the (possibly snapped) value so the tick and arch land on the step.
+  controlAngle.value = step ? getControlAngle(value) : clampedAngle
 }
 
-/** Gets the y coordinate associated with the event */
-function getEventY(event: TouchEvent | MouseEvent): number {
-  if (window.TouchEvent && event instanceof TouchEvent) {
-    return event.touches[0].pageY
-  } else if (event instanceof MouseEvent) {
-    currentY = event.clientY
-    return currentY
-  }
-  return 0
+function resetValue() {
+  changeValue(getControlAngle(knobOptions.value.defaultValue))
 }
 
-function moveListener(event: TouchEvent | MouseEvent) {
-  mouseMoved.value = true
-  if (mouseIsDown.value) {
-    currentY = getEventY(event)
-    let direction: 'up' | 'down'
-    const curYchange = prevY - currentY
-
-    if (curYchange < 0) {
-      direction = 'down'
-    } else {
-      direction = 'up'
-    }
-
-    if (
-      prevY !== currentY &&
-      ((direction === 'up' && controlAngle.value < MAX_ANGLE) ||
-        (direction === 'down' && controlAngle.value > MIN_ANGLE))
-    ) {
-      const change = changeToControlAngle(prevY, curYchange, shiftModifier.value)
-
-      if (controlAngle.value + change < MIN_ANGLE) {
-        controlAngle.value = MIN_ANGLE
-      } else if (controlAngle.value + change > MAX_ANGLE) {
-        controlAngle.value = MAX_ANGLE
-      } else {
-        controlAngle.value += change
-      }
-
-      vModel.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
-    }
-    prevY = currentY
-  }
-}
-
-const debouncedMoveListener = leadingDebounce(moveListener)
-
-/** According to the chosen option, prevents propagation of the event.
- * @remarks If set, keeps page from scrolling while handling the knob
- */
-function preventScrolling(event: TouchEvent | MouseEvent | KeyboardEvent): void {
-  if (passiveEvents === false) {
+/** Prevents the page from scrolling while interacting, unless `passiveEvents` is set. */
+function preventScrolling(event: Event) {
+  if (!knobOptions.value.passiveEvents) {
     event.preventDefault()
     event.stopPropagation()
   }
 }
 
-const upListener = () => {
-  mouseIsDown.value = false
-}
+const pointerIsDown = ref(false)
+let prevY = 0
 
-function resetValue() {
-  controlAngle.value = MIN_ANGLE
-}
-
-function changeValue(change: number) {
-  if (change > controlAngle.value) {
-    if (change < MAX_ANGLE) {
-      controlAngle.value = change
-    } else {
-      controlAngle.value = MAX_ANGLE
-    }
+const applyDrag = rafThrottle((clientY: number, shiftKey: boolean) => {
+  const yChange = prevY - clientY
+  prevY = clientY
+  if (yChange !== 0) {
+    changeValue(controlAngle.value + changeToControlAngle(prevY, yChange, shiftKey))
   }
+})
 
-  if (change < controlAngle.value) {
-    if (change < controlAngle.value && change > MIN_ANGLE) {
-      controlAngle.value = change
-    } else {
-      controlAngle.value = MIN_ANGLE
-    }
-  }
-  vModel.value = controlAngleToValue(knobMinValue, knobMaxValue, controlAngle.value)
-}
-
-function keyDownListener(event: KeyboardEvent) {
-  // Update the shift modifier here already, otherwise the precise mode is not triggered properly
-  if (event.key === 'Shift') {
-    shiftModifier.value = true
-  }
-
-  if (hasFocus.value && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-    preventScrolling(event)
-  }
-}
-
-function keyUpListener(event: KeyboardEvent) {
-  if (event.key === 'Shift') {
-    shiftModifier.value = false
-  }
-
-  let newValue: number
-  const keyModifier = shiftModifier.value ? 1 : keyModifierFactor
-  if (hasFocus.value && event.key === 'ArrowUp') {
-    newValue = controlAngle.value + 1 * keyModifier
-    changeValue(newValue)
-  }
-
-  if (hasFocus.value && event.key === 'ArrowDown') {
-    newValue = controlAngle.value - 1 * keyModifier
-    changeValue(newValue)
-  }
-}
-
-function wheelListener(event: WheelEvent) {
-  let newValue: number
-  const wheelModifier = event.shiftKey ? 1 : wheelModifierFactor
-  if ((!event.shiftKey && event.deltaY < 0) || (event.shiftKey && event.deltaX < 0)) {
-    newValue = controlAngle.value + 1 * wheelModifier
-  } else {
-    newValue = controlAngle.value - 1 * wheelModifier
-  }
-  changeValue(newValue)
+function onPointerDown(event: PointerEvent) {
+  pointerIsDown.value = true
+  prevY = event.clientY
+  // Capture keeps move/up events flowing even when the pointer leaves the knob.
+  const target = event.target as Element
+  target.setPointerCapture(event.pointerId)
   preventScrolling(event)
 }
 
-function mouseOverHandler() {
-  mouseIsOver.value = true
+function onPointerMove(event: PointerEvent) {
+  if (!pointerIsDown.value) {
+    return
+  }
+  preventScrolling(event)
+  applyDrag(event.clientY, event.shiftKey)
 }
 
-function mouseOutHandler() {
-  mouseIsOver.value = false
+function onPointerUp() {
+  pointerIsDown.value = false
+}
+
+function onWheel(event: WheelEvent) {
+  const step = event.shiftKey ? 1 : knobOptions.value.wheelFactor
+  const scrollingUp = event.shiftKey ? event.deltaX < 0 : event.deltaY < 0
+  changeValue(controlAngle.value + (scrollingUp ? step : -step))
+  preventScrolling(event)
+}
+
+function onKeyDown(event: KeyboardEvent) {
+  const step = event.shiftKey ? 1 : knobOptions.value.keyFactor
+  switch (event.key) {
+    case 'ArrowUp':
+    case 'ArrowRight':
+      changeValue(controlAngle.value + step)
+      break
+    case 'ArrowDown':
+    case 'ArrowLeft':
+      changeValue(controlAngle.value - step)
+      break
+    case 'Home':
+      changeValue(MIN_ANGLE)
+      break
+    case 'End':
+      changeValue(MAX_ANGLE)
+      break
+    default:
+      return
+  }
+  preventScrolling(event)
 }
 
 watch(
-  () => knobElement.value,
-  (element, oldElement) => {
-    if (element && !oldElement) {
-      element.addEventListener('mousedown', downListener)
-      element.addEventListener('touchstart', downListener, { passive: passiveEvents })
-      element.addEventListener('wheel', wheelListener, { passive: passiveEvents })
-      element.addEventListener('mouseenter', mouseOverHandler)
-      element.addEventListener('mouseleave', mouseOutHandler)
-      document.addEventListener('mouseup', upListener)
-      document.addEventListener('touchend', upListener)
-      document.addEventListener('mousemove', debouncedMoveListener)
-      document.addEventListener('touchmove', debouncedMoveListener)
-      document.addEventListener('keydown', keyDownListener)
-      document.addEventListener('keyup', keyUpListener)
-
-      const controlValue = valueToControlAngle(knobMinValue, knobMaxValue, props.modelValue)
-      controlAngle.value = controlValue
+  () => [modelValue.value, knobOptions.value.minValue, knobOptions.value.maxValue] as const,
+  ([value]) => {
+    if (!pointerIsDown.value) {
+      controlAngle.value = getControlAngle(value)
     }
-  }
+  },
 )
 
-watch(
-  () => props.modelValue,
-  (value) => {
-    if (mouseIsOver.value === false && mouseIsDown.value === false && hasFocus.value === false) {
-      // console.log('propvalue changed for ', knobElement.value.attributes.id)
-      const controlValue = valueToControlAngle(knobMinValue, knobMaxValue, value)
-      controlAngle.value = controlValue
-    }
-  }
-)
-
-onBeforeUnmount(() => {
-  knobElement.value.removeEventListener('mousedown', downListener)
-  knobElement.value.removeEventListener('touchstart', downListener)
-  knobElement.value.removeEventListener('wheel', wheelListener)
-  knobElement.value.removeEventListener('mouseenter', mouseOverHandler)
-  knobElement.value.removeEventListener('mouseleave', mouseOutHandler)
-  document.removeEventListener('mouseup', upListener)
-  document.removeEventListener('touchend', upListener)
-  document.removeEventListener('mousemove', debouncedMoveListener)
-  document.removeEventListener('touchmove', debouncedMoveListener)
-  document.removeEventListener('keydown', keyDownListener)
-  document.removeEventListener('keyup', keyUpListener)
-})
+onBeforeUnmount(() => applyDrag.cancel())
 </script>
+
 <template>
   <svg
-    ref="knobElement"
-    :width="imageSize"
-    :height="imageSize"
+    :width="knobOptions.imageSize"
+    :height="knobOptions.imageSize"
     viewBox="0 0 100 100"
     role="slider"
-    :aria-label="ariaLabel"
-    :aria-valuemin="knobMinValue"
-    :aria-valuemax="knobMaxValue"
-    :aria-valuenow="vModel"
-    :tabindex="tabIndex"
-    :class="svgClass"
+    :aria-label="knobOptions.ariaLabel"
+    :aria-valuemin="knobOptions.minValue"
+    :aria-valuemax="knobOptions.maxValue"
+    :aria-valuenow="modelValue"
+    :aria-valuetext="valueText"
+    aria-orientation="vertical"
+    :tabindex="knobOptions.tabIndex"
+    :class="knobOptions.svgClass"
     @click.alt="resetValue"
-    @focus="hasFocus = true"
-    @blur="hasFocus = false"
+    @pointerdown="onPointerDown"
+    @pointermove="onPointerMove"
+    @pointerup="onPointerUp"
+    @pointercancel="onPointerUp"
+    @lostpointercapture="onPointerUp"
+    @wheel="onWheel"
+    @keydown="onKeyDown"
   >
     <circle
       :cx="HALF_VIEWBOX"
       :cy="HALF_VIEWBOX"
-      :r="bgRadius"
+      :r="knobOptions.bgRadius"
       stroke="currentColor"
       fill="currentColor"
-      :class="bgClass"
+      :class="knobOptions.bgClass"
       :stroke-width="1"
     />
 
     <path
       :d="rim"
-      :stroke-width="rimStroke"
+      :stroke-width="knobOptions.rimStroke"
       stroke="currentColor"
       fill="none"
-      :class="rimClass"
-    ></path>
+      :class="knobOptions.rimClass"
+    />
 
     <path
-      v-if="controlAngle > 120"
+      v-if="controlAngle > MIN_ANGLE"
       :d="valueArch"
-      :stroke-width="valueArchStroke"
+      :stroke-width="knobOptions.valueArchStroke"
       stroke="currentColor"
       fill="none"
-      :class="valueArchClass"
-    ></path>
+      :class="knobOptions.valueArchClass"
+    />
 
     <line
-      v-if="showTick"
-      :x1="tickStartX"
-      :y1="tickStartY"
-      :x2="tickEndX"
-      :y2="tickEndY"
+      v-if="knobOptions.showTick"
+      :x1="tick.x1"
+      :y1="tick.y1"
+      :x2="tick.x2"
+      :y2="tick.y2"
       stroke="currentColor"
-      :stroke-width="tickStroke"
-      :class="tickClass"
+      :stroke-width="knobOptions.tickStroke"
+      :class="knobOptions.tickClass"
     />
 
     <text
-      v-if="showValue && (!hideDefaultValue || startValue !== vModel)"
-      :x="valueTextX"
-      :y="valueTextY"
+      v-if="showValueText"
+      :x="knobOptions.valueTextX"
+      :y="knobOptions.valueTextY"
+      :font-size="knobOptions.fontSize"
       text-anchor="middle"
+      dominant-baseline="central"
       fill="currentColor"
-      :class="valueTextClass"
+      :class="knobOptions.valueTextClass"
     >
-      {{ Math.ceil(vModel) }}
+      {{ valueText }}
     </text>
   </svg>
 </template>

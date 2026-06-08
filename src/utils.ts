@@ -4,19 +4,34 @@ export function degToRad(degrees: number) {
   return (degrees * Math.PI) / 180
 }
 
-export function leadingDebounce<A = unknown, R = void>(func: (args: A) => R, timeout = 13) {
-  let timer: NodeJS.Timeout | undefined
-  return (...args: A[]) => {
-    if (!timer) {
-      // @ts-expect-error FIXME: couldn't figure this one out!
-      func.apply(this, args)
-    } else {
-      clearTimeout(timer)
-    }
-    timer = setTimeout(() => {
-      timer = undefined
-    }, timeout)
+/**
+ * Throttles `func` to at most once per animation frame, always invoking it with
+ * the most recent arguments. Keeps high-frequency pointer moves smooth without
+ * dropping the final position.
+ */
+export function rafThrottle<Args extends unknown[]>(func: (...args: Args) => void) {
+  let rafId: number | null = null
+  let lastArgs: Args | null = null
+
+  const throttled = (...args: Args) => {
+    lastArgs = args
+    rafId ??= requestAnimationFrame(() => {
+      rafId = null
+      if (lastArgs) {
+        func(...lastArgs)
+      }
+    })
   }
+
+  throttled.cancel = () => {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+    }
+    rafId = null
+    lastArgs = null
+  }
+
+  return throttled
 }
 
 export function changeToControlAngle(startValue: number, change: number, shiftModifier = false) {
@@ -43,6 +58,21 @@ export function controlAngleToValue(minValue: number, maxValue: number, controlA
     controlPercentage = (controlAngle - MIN_ANGLE) / controlRange
   }
   return minValue + valueRange * controlPercentage
+}
+
+/**
+ * Snaps `value` to the nearest multiple of `step` measured from `minValue`, then
+ * clamps to the range. A falsy `step` leaves the value untouched (continuous).
+ * Rounds to the step's decimal places to avoid floating-point drift (e.g. 0.01).
+ */
+export function quantize(minValue: number, maxValue: number, step: number, value: number) {
+  if (!step) {
+    return value
+  }
+  const snapped = minValue + Math.round((value - minValue) / step) * step
+  const clamped = Math.min(maxValue, Math.max(minValue, snapped))
+  const decimals = (String(step).split('.')[1] ?? '').length
+  return Number(clamped.toFixed(decimals))
 }
 
 export function valueToControlAngle(minValue: number, maxValue: number, value: number) {
