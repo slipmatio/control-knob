@@ -33,7 +33,7 @@ coordinate system that is not affected by the imageSize.
 | maxValue         | 100                                              | Maximum value of the knob v-model.                         |
 | showTick         | true                                             | Show visible marker of the knob position.                  |
 | showValue        | true                                             | Show value label inside the knob.                          |
-| hideDefaultValue | false                                            | Hide value label if value hasn't been changed.             |
+| hideDefaultValue | true                                             | Hide value label if value hasn't been changed.             |
 | tickLength       | 18                                               | Tick length in pixels.                                     |
 | tickOffset       | 10                                               | Tick offset in pixels.                                     |
 | tickStroke       | 3                                                | Tick stroke width.                                         |

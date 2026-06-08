@@ -136,8 +136,10 @@ const valueArch = computed(
     <h3 class="mt-4 mb-4 text-xl font-semibold">Debug data</h3>
     <table class="font-mono text-sm">
       <thead class="uppercase">
-        <th class="w-24 text-left">Variable</th>
-        <th class="text-left">Value</th>
+        <tr>
+          <th class="w-24 text-left">Variable</th>
+          <th class="text-left">Value</th>
+        </tr>
       </thead>
       <tbody>
         <tr>
