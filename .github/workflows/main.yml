@@ -37,7 +37,7 @@ jobs:
 
       ## Test
       - name: Run component + unit tests
-        run: pnpm test:ci
+        run: pnpm test:run
 
       # - name: Run e2e tests
       #   run: |
