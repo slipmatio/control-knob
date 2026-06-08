@@ -2,6 +2,10 @@ export interface ControlKnobOptions {
   imageSize?: number
   minValue?: number
   maxValue?: number
+  /** Value restored on alt-click / reset. Defaults to `minValue`. */
+  defaultValue?: number
+  /** Formats the displayed value and `aria-valuetext`. Defaults to rounding. */
+  formatValue?: (value: number) => string
   showTick?: boolean
   showValue?: boolean
   hideDefaultValue?: boolean

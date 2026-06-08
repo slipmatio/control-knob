@@ -4,18 +4,34 @@ export function degToRad(degrees: number) {
   return (degrees * Math.PI) / 180
 }
 
-export function leadingDebounce<Args extends unknown[], Return = void>(func: (...args: Args) => Return, timeout = 13) {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  return (...args: Args) => {
-    if (!timer) {
-      func(...args)
-    } else {
-      clearTimeout(timer)
-    }
-    timer = setTimeout(() => {
-      timer = undefined
-    }, timeout)
+/**
+ * Throttles `func` to at most once per animation frame, always invoking it with
+ * the most recent arguments. Keeps high-frequency pointer moves smooth without
+ * dropping the final position.
+ */
+export function rafThrottle<Args extends unknown[]>(func: (...args: Args) => void) {
+  let rafId: number | null = null
+  let lastArgs: Args | null = null
+
+  const throttled = (...args: Args) => {
+    lastArgs = args
+    rafId ??= requestAnimationFrame(() => {
+      rafId = null
+      if (lastArgs) {
+        func(...lastArgs)
+      }
+    })
   }
+
+  throttled.cancel = () => {
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId)
+    }
+    rafId = null
+    lastArgs = null
+  }
+
+  return throttled
 }
 
 export function changeToControlAngle(startValue: number, change: number, shiftModifier = false) {

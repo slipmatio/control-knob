@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { expect, test } from 'vitest'
-import ControlKnob from '../../src/ControlKnob.vue'
+import ControlKnob from '@/ControlKnob.vue'
 
 test('applies reactive options', async () => {
   const wrapper = mount(ControlKnob, {

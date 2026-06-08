@@ -1,8 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest'
-import { MAX_ANGLE, MIN_ANGLE } from '../../src/constants'
-import { changeToControlAngle, controlAngleToValue, degToRad, leadingDebounce } from '../../src/utils'
-
-const testFn = (val: number) => val + 1
+import { MAX_ANGLE, MIN_ANGLE } from '@/constants'
+import { changeToControlAngle, controlAngleToValue, degToRad, rafThrottle } from '@/utils'
 
 test('degToRad', () => {
   expect(degToRad(0)).toEqual(0)
@@ -12,33 +10,37 @@ test('degToRad', () => {
   expect(degToRad(360)).toEqual(Math.PI * 2)
 })
 
-describe('leadingDebounce', () => {
-  let func = vi.fn()
-
+describe('rafThrottle', () => {
   beforeEach(() => {
-    func = vi.fn()
+    vi.useFakeTimers()
   })
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.useRealTimers()
   })
 
-  it('debounces', () => {
-    const mock = vi.fn().mockImplementation(testFn)
-    const debouncedMock = leadingDebounce(func)
+  it('runs once per frame with the latest arguments', () => {
+    const func = vi.fn()
+    const throttled = rafThrottle(func)
 
-    mock(1)
-    debouncedMock(1)
+    throttled(1)
+    throttled(2)
+    throttled(3)
+    expect(func).not.toHaveBeenCalled()
 
-    expect(mock).toHaveBeenCalledTimes(1)
+    vi.advanceTimersToNextFrame()
     expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenCalledWith(3)
+  })
 
-    for (let i = 0; i < 5; i++) {
-      mock(1)
-      debouncedMock()
-    }
+  it('cancel prevents a pending call', () => {
+    const func = vi.fn()
+    const throttled = rafThrottle(func)
 
-    expect(mock.mock.calls.length).toBe(6)
-    expect(func.mock.calls.length).toBeLessThan(6)
+    throttled(1)
+    throttled.cancel()
+
+    vi.advanceTimersToNextFrame()
+    expect(func).not.toHaveBeenCalled()
   })
 })
 
