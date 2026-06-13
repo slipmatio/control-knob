@@ -24,6 +24,7 @@ export default defineConfig({
   },
   build: {
     emptyOutDir: true,
+    copyPublicDir: false,
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, './src/lib.ts'),

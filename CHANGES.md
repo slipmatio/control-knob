@@ -1,5 +1,10 @@
 # Changelog
 
+## v2026.6.1
+
+- fix: `types` now resolve correctly — declarations emit to `dist/lib.d.ts` instead of `dist/src/lib.d.ts`
+- chore: stop shipping demo/test declarations and `favicon.ico` in the published package
+
 ## v2026.6.0
 
 Warning: contains BREAKING CHANGES.

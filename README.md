@@ -46,7 +46,7 @@ const options: ControlKnobOptions = {
   minValue: 0,
   maxValue: 12,
   step: 0.01,
-  formatValue: v => v.toFixed(1),
+  formatValue: (v) => v.toFixed(1),
 }
 </script>
 
@@ -132,5 +132,6 @@ Contributions are welcome! Please follow the
 ## Elsewhere
 
 - Follow [@uninen on X](https://x.com/uninen) or [uninen.net on Bluesky](https://bsky.app/profile/uninen.net)
-- Read my learnings around Vue / TypeScript and other Web dev topics from my [Today I Learned blog](https://til.unessa.net/)
+- Read my learnings around Vue / TypeScript and other Web dev topics from my
+  [Today I Learned blog](https://til.unessa.net/)
 - If you speak Finnish, check out [Koneoppiblogi](https://koneoppiblogi.uninen.net)
