@@ -3,7 +3,7 @@
   "extends": ["config:recommended", "helpers:pinGitHubActionDigestsToSemver"],
   "enabledManagers": ["npm", "github-actions"],
   "lockFileMaintenance": {
-    "enabled": true,
+    "enabled": false,
     "automerge": true
   },
   "packageRules": [
