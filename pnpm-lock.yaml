@@ -10,10 +10,10 @@ importers:
     devDependencies:
       '@playwright/experimental-ct-vue':
         specifier: ^1.60.0
-        version: 1.60.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))(vue@3.5.38(typescript@6.0.3))
+        version: 1.61.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))(vue@3.5.38(typescript@6.0.3))
       '@playwright/test':
         specifier: ^1.60.0
-        version: 1.60.0
+        version: 1.61.0
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.1(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))
@@ -608,17 +608,17 @@ packages:
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  '@playwright/experimental-ct-core@1.60.0':
-    resolution: {integrity: sha512-cMYDe0KpfdfFTZR2ev6frlgIwksSnXCu1o5s/DxpiVPTJeKp8TSXo9dzKuRhUMDAxAQESF1uM4uPQ56PZ/a5QA==}
+  '@playwright/experimental-ct-core@1.61.0':
+    resolution: {integrity: sha512-BXfrGmeFzEHVvbL4K9jvtfKS/3Fh19b7Kv+WCXmI53EyzNfvYUxoq3EDj3Uw/wDKj9Xkh0l1TLpgkyL9e2h0fQ==}
     engines: {node: '>=18'}
 
-  '@playwright/experimental-ct-vue@1.60.0':
-    resolution: {integrity: sha512-tmNRdsRCI6133Jl/pHRYXz+ZmKwrJKnIg6sd5pDq69yF28zitLyoB0gh95p15uEh0BP5++FLAC2iSRs6l+KUNQ==}
+  '@playwright/experimental-ct-vue@1.61.0':
+    resolution: {integrity: sha512-0nLucwIjlsxn2dv+laAbcWernzYbffcxCgaJB1rumPavUzHgPB5rgboGLY4L8Hw4Wpb+MOVn/P7hdTotk8OS6w==}
     engines: {node: '>=18'}
     hasBin: true
 
-  '@playwright/test@1.60.0':
-    resolution: {integrity: sha512-O71yZIbAh/PxDMNGns37GHBIfrVkEVyn+AXyIa5dOTfb4/xNvRWV+Vv/NMbNCtODB/pO7vLlF2OTmMVLhmr7Ag==}
+  '@playwright/test@1.61.0':
+    resolution: {integrity: sha512-cKA5B6lpFEMyMGjxF54QihfYpB4FkEGH+qZhtArDEG+wezQAJY8Pq6C7T1SjWz+FFzt3TbyoXBQYk/0292TdJA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -1793,13 +1793,13 @@ packages:
   pkg-types@2.3.1:
     resolution: {integrity: sha512-y+ichcgc2LrADuhLNAx8DFjVfgz91pRxfZdI3UDhxHvcVEZsenLO+7XaU5vOp0u/7V/wZ+plyuQxtrDlZJ+yeg==}
 
-  playwright-core@1.60.0:
-    resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
+  playwright-core@1.61.0:
+    resolution: {integrity: sha512-caX7TrY3Ml6egyDX0WUcTHDxodl/b51y5wJOdCEA36QviK/s2g081hvmGs8eaE3DWb6NYZQ6BjO/QkNRPenoPA==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.60.0:
-    resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==}
+  playwright@1.61.0:
+    resolution: {integrity: sha512-Z+7BeeqQPRRzklHsVFP4KTGIyMxKUmfeRA4WisM6G3/XW6nwGeX6fX9qYaDa+CiUqpOkb2f6X3nar05R3kSuJQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -2543,10 +2543,10 @@ snapshots:
 
   '@pkgr/core@0.3.6': {}
 
-  '@playwright/experimental-ct-core@1.60.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)':
+  '@playwright/experimental-ct-core@1.61.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)':
     dependencies:
-      playwright: 1.60.0
-      playwright-core: 1.60.0
+      playwright: 1.61.0
+      playwright-core: 1.61.0
       vite: 6.4.3(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)
     transitivePeerDependencies:
       - '@types/node'
@@ -2561,9 +2561,9 @@ snapshots:
       - tsx
       - yaml
 
-  '@playwright/experimental-ct-vue@1.60.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))(vue@3.5.38(typescript@6.0.3))':
+  '@playwright/experimental-ct-vue@1.61.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))(vue@3.5.38(typescript@6.0.3))':
     dependencies:
-      '@playwright/experimental-ct-core': 1.60.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)
+      '@playwright/experimental-ct-core': 1.61.0(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)
       '@vitejs/plugin-vue': 5.2.4(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0))(vue@3.5.38(typescript@6.0.3))
     transitivePeerDependencies:
       - '@types/node'
@@ -2580,9 +2580,9 @@ snapshots:
       - vue
       - yaml
 
-  '@playwright/test@1.60.0':
+  '@playwright/test@1.61.0':
     dependencies:
-      playwright: 1.60.0
+      playwright: 1.61.0
 
   '@rolldown/binding-android-arm64@1.0.3':
     optional: true
@@ -3677,11 +3677,11 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
-  playwright-core@1.60.0: {}
+  playwright-core@1.61.0: {}
 
-  playwright@1.60.0:
+  playwright@1.61.0:
     dependencies:
-      playwright-core: 1.60.0
+      playwright-core: 1.61.0
     optionalDependencies:
       fsevents: 2.3.2
 
