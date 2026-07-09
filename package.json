@@ -57,7 +57,7 @@
     "eslint-plugin-oxlint": "^1.68.0",
     "eslint-plugin-vue": "^10.9.2",
     "happy-dom": "^20.10.2",
-    "oxfmt": "^0.57.0",
+    "oxfmt": "^0.58.0",
     "oxlint": "^1.68.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
